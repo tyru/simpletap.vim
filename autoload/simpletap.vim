@@ -123,7 +123,7 @@ func! simpletap#raise_ok(command, regex, ...) "{{{
         if v:exception =~# a:regex
             call call('simpletap#ok', [1] + a:000)
         else
-            throw v:exception
+            throw substitute(v:exception, '^Vim'.'\C', '', '')
         endif
     endtry
 endfunc "}}}
