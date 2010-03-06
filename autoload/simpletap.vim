@@ -89,6 +89,7 @@ func! s:initialize_once() "{{{
     \       'like': 'ok',
     \       'unlike': 'ok',
     \       'stdout_is': 'ok',
+    \       'stdout_isnt': 'ok',
     \       'stdout_like': 'ok',
     \       'stdout_unlike': 'ok',
     \   },
@@ -102,6 +103,7 @@ func! s:initialize_once() "{{{
     \       'like': 'got: %s, expected like: %s',
     \       'unlike': 'got: %s, expected like not: %s',
     \       'stdout_is': 'got: %s, expected: %s',
+    \       'stdout_isnt': 'got: %s, expected: %s',
     \       'stdout_like': 'got: %s, expected like: %s',
     \       'stdout_unlike': 'got: %s, expected like not: %s',
     \   },
@@ -321,6 +323,19 @@ func! simpletap#stdout_is(Code, expected, ...) "{{{
         call s:passed(testname, 'stdout_is')
     else
         call s:failed(testname, 'stdout_is', output, a:expected)
+    endif
+
+    call s:step_num()
+endfunc "}}}
+
+func! simpletap#stdout_isnt(Code, expected, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    let output = s:get_output(a:Code)
+    if !s:equal(output, a:expected)
+        call s:passed(testname, 'stdout_isnt')
+    else
+        call s:failed(testname, 'stdout_isnt', output, a:expected)
     endif
 
     call s:step_num()
