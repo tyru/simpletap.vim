@@ -28,6 +28,7 @@ set cpo&vim
 
 " Variables {{{
 let s:current_test_num = 1
+let s:dont_change_current_num = 0
 " }}}
 
 " Functions {{{
@@ -99,6 +100,7 @@ func! s:error(msg) "{{{
 endfunc "}}}
 
 func! s:get_output(Code) "{{{
+    let s:dont_change_current_num = 1
     redir => output
 
     try
@@ -118,7 +120,14 @@ func! s:get_output(Code) "{{{
         return substitute(output, '^\n', '', '')
     finally
         redir END
+        let s:dont_change_current_num = 0
     endtry
+endfunc "}}}
+
+func! s:step_num() "{{{
+    if !s:dont_change_current_num
+        let s:current_test_num += 1
+    endif
 endfunc "}}}
 
 func! s:initialize_once() "{{{
@@ -174,7 +183,7 @@ func! simpletap#ok(cond, ...) "{{{
         call s:failed(testname, 'ok')
     endif
 
-    let s:current_test_num += 1
+    call s:step_num()
 endfunc "}}}
 
 func! simpletap#is(got, expected, ...) "{{{
@@ -186,7 +195,7 @@ func! simpletap#is(got, expected, ...) "{{{
         call s:failed(testname, 'is', a:got, a:expected)
     endif
 
-    let s:current_test_num += 1
+    call s:step_num()
 endfunc "}}}
 
 func! simpletap#like(got, regex, ...) "{{{
@@ -198,7 +207,7 @@ func! simpletap#like(got, regex, ...) "{{{
         call s:failed(testname, 'like', a:got, a:regex)
     endif
 
-    let s:current_test_num += 1
+    call s:step_num()
 endfunc "}}}
 
 func! simpletap#unlike(got, regex, ...) "{{{
@@ -210,7 +219,7 @@ func! simpletap#unlike(got, regex, ...) "{{{
         call s:failed(testname, 'unlike', a:got, a:regex)
     endif
 
-    let s:current_test_num += 1
+    call s:step_num()
 endfunc "}}}
 
 func! simpletap#raise_ok(command, regex, ...) "{{{
@@ -255,7 +264,7 @@ func! simpletap#stdout_is(Code, expected, ...) "{{{
         call s:failed(testname, 'stdout_is', output, a:expected)
     endif
 
-    let s:current_test_num += 1
+    call s:step_num()
 endfunc "}}}
 
 func! simpletap#stdout_like(Code, regex, ...) "{{{
@@ -268,7 +277,7 @@ func! simpletap#stdout_like(Code, regex, ...) "{{{
         call s:failed(testname, 'stdout_like', output, a:regex)
     endif
 
-    let s:current_test_num += 1
+    call s:step_num()
 endfunc "}}}
 
 func! simpletap#stdout_unlike(Code, regex, ...) "{{{
@@ -281,7 +290,7 @@ func! simpletap#stdout_unlike(Code, regex, ...) "{{{
         call s:failed(testname, 'stdout_unlike', output, a:regex)
     endif
 
-    let s:current_test_num += 1
+    call s:step_num()
 endfunc "}}}
 
 func! simpletap#diag(msg) "{{{
