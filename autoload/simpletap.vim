@@ -368,7 +368,9 @@ func! simpletap#run(...) "{{{
     endif
 
     let tested = 0
+    let lastline = 0    " lastline is number but becomes string when test failed.
     call s:begin_test_once()
+
     for t in s:glob(pat)
         if g:simpletap#show_only_failed
             redir => output
@@ -376,10 +378,12 @@ func! simpletap#run(...) "{{{
             redir END
 
             " Show messages only when test(s) failed.
-            let failed_tests = filter(copy(s:test_result), 'v:val ==# s:FAIL')
-            if !empty(failed_tests)
-                for line in split(output, '\n')
-                    echomsg line
+            let failed = !empty(filter(copy(s:test_result), 'v:val ==# s:FAIL'))
+            if failed
+                let lines = split(output, '\n')
+                let lastline = remove(lines, -1)
+                for l in lines
+                    echomsg l
                 endfor
             endif
         else
@@ -390,6 +394,14 @@ func! simpletap#run(...) "{{{
     endfor
     call s:end_test_once()
 
+    if g:simpletap#show_only_failed
+        redraw
+        if type(lastline) == type("")
+            echomsg lastline
+        else
+            echomsg 'All test(s) passed.'
+        endif
+    endif
     if !tested
         call s:warn('no tests to run.')
     endif
