@@ -86,6 +86,7 @@ func! s:initialize_once() "{{{
     \       'cmp_ok': 'ok',
     \       'is': 'ok',
     \       'isnt': 'ok',
+    \       'is_deeply': 'ok',
     \       'like': 'ok',
     \       'unlike': 'ok',
     \       'stdout_is': 'ok',
@@ -101,6 +102,7 @@ func! s:initialize_once() "{{{
     \       'cmp_ok': 'got: %s, expected: %s',
     \       'is': 'got: %s, expected: %s',
     \       'isnt': 'got: %s, expected not: %s',
+    \       'is_deeply': 'got: %s, expected not: %s',
     \       'like': 'got: %s, expected like: %s',
     \       'unlike': 'got: %s, expected like not: %s',
     \       'stdout_is': 'got: %s, expected: %s',
@@ -138,6 +140,11 @@ func! s:equal(l, r) "{{{
     \   && type(a:l) != type([])
     \   && type(a:r) != type({})
     \   && type(a:r) != type([])
+    \   && a:l ==# a:r
+endfunc "}}}
+
+func! s:equal_deeply(l, r) "{{{
+    return type(a:l) == type(a:r)
     \   && a:l ==# a:r
 endfunc "}}}
 
@@ -355,6 +362,20 @@ func! simpletap#isnt(got, expected, ...) "{{{
     call s:step_num()
 endfunc "}}}
 call s:add_method('isnt')
+
+
+func! simpletap#is_deeply(got, expected, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    if s:equal_deeply(a:got, a:expected)
+        call s:passed(testname, 'is_deeply')
+    else
+        call s:failed(testname, 'is_deeply', a:got, a:expected)
+    endif
+
+    call s:step_num()
+endfunc "}}}
+call s:add_method('is_deeply')
 
 
 func! simpletap#like(got, regex, ...) "{{{
