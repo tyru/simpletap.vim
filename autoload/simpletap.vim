@@ -20,9 +20,7 @@ set cpo&vim
 " }}}
 
 " TODO
-" - OO interface
 " - Add command macros.
-" - Put format string to dictionary.
 " - s:get_func_varnames()
 "   - Add function to define autoload functions.
 " - Add global vars to define echohl
@@ -69,6 +67,8 @@ func! s:initialize_once() "{{{
         if !exists(v)
             let {v} = a:default
         endif
+
+        let s:simpletap[a:varname] = deepcopy({v})
     endfunc "}}}
     func! s:def_hash(varname, default) "{{{
         let v = s:varname(a:varname)
@@ -76,6 +76,8 @@ func! s:initialize_once() "{{{
             let {v} = {}
         endif
         call extend({v}, a:default, 'keep')
+
+        let s:simpletap[a:varname] = deepcopy({v})
     endfunc "}}}
 
     call s:def_hash(
@@ -112,6 +114,8 @@ func! s:initialize_once() "{{{
     delfunc s:varname
     delfunc s:def
     delfunc s:def_hash
+
+    lockvar s:simpletap
 endfunc "}}}
 
 
@@ -221,6 +225,55 @@ endfunc "}}}
 " }}}
 
 
+" OO interface {{{
+let s:simpletap = {}    " See defintions at s:initialize_once().
+
+func! simpletap#new(...) "{{{
+    let obj = deepcopy(s:simpletap)
+    let obj.save_prop = a:0 != 0 ? a:1 : {}
+    lockvar obj.save_prop
+    return obj
+endfunc "}}}
+
+func! s:add_method(name) "{{{
+    if has_key(s:simpletap, a:name)
+        return
+    endif
+
+    let template = [
+    \   'func! s:simpletap.%s(...) dict',
+    \       'let saved = empty(self.save_prop) ? {} : s:get_current_global_vars()',
+    \       'call s:set_global_vars(self.save_prop)',
+    \       'try',
+    \           'return call("simpletap#%s", a:000)',
+    \       'finally',
+    \           'call s:set_global_vars(saved)',
+    \       'endtry',
+    \   'endfunc',
+    \]
+    execute printf(join(template, "\n"), a:name, a:name)
+endfunc "}}}
+
+func! s:get_global_varnames() "{{{
+    return keys(filter(copy(s:simpletap), 'type(v:val) != type(function("tr"))'))
+endfunc "}}}
+
+func! s:get_current_global_vars() "{{{
+    let ret = {}
+    for var in s:get_global_varnames()
+        let ret[var] = deepcopy(g:simpletap#{var})
+    endfor
+    return ret
+endfunc "}}}
+
+func! s:set_global_vars(prop) "{{{
+    for var in keys(a:prop)
+        let g:simpletap#{var} = deepcopy(a:prop[var])
+    endfor
+endfunc "}}}
+
+" }}}
+
 " Autoload {{{
 
 func! simpletap#run() "{{{
@@ -237,6 +290,7 @@ func! simpletap#run() "{{{
         call s:warn('no tests to run.')
     endif
 endfunc "}}}
+call s:add_method('run')
 
 
 func! simpletap#ok(cond, ...) "{{{
@@ -250,6 +304,7 @@ func! simpletap#ok(cond, ...) "{{{
 
     call s:step_num()
 endfunc "}}}
+call s:add_method('ok')
 
 
 func! simpletap#is(got, expected, ...) "{{{
@@ -263,6 +318,7 @@ func! simpletap#is(got, expected, ...) "{{{
 
     call s:step_num()
 endfunc "}}}
+call s:add_method('is')
 
 func! simpletap#isnt(got, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
@@ -275,6 +331,7 @@ func! simpletap#isnt(got, expected, ...) "{{{
 
     call s:step_num()
 endfunc "}}}
+call s:add_method('isnt')
 
 
 func! simpletap#like(got, regex, ...) "{{{
@@ -288,6 +345,7 @@ func! simpletap#like(got, regex, ...) "{{{
 
     call s:step_num()
 endfunc "}}}
+call s:add_method('like')
 
 func! simpletap#unlike(got, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
@@ -300,6 +358,7 @@ func! simpletap#unlike(got, regex, ...) "{{{
 
     call s:step_num()
 endfunc "}}}
+call s:add_method('unlike')
 
 
 func! simpletap#throws_ok(command, regex, ...) "{{{
@@ -314,6 +373,7 @@ func! simpletap#throws_ok(command, regex, ...) "{{{
         endif
     endtry
 endfunc "}}}
+call s:add_method('throws_ok')
 
 
 func! simpletap#exists_func(Fn, ...) "{{{
@@ -334,6 +394,7 @@ func! simpletap#exists_func(Fn, ...) "{{{
         return 0
     endtry
 endfunc "}}}
+call s:add_method('exists_func')
 
 
 func! simpletap#stdout_is(Code, expected, ...) "{{{
@@ -348,6 +409,7 @@ func! simpletap#stdout_is(Code, expected, ...) "{{{
 
     call s:step_num()
 endfunc "}}}
+call s:add_method('stdout_is')
 
 func! simpletap#stdout_isnt(Code, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
@@ -361,6 +423,7 @@ func! simpletap#stdout_isnt(Code, expected, ...) "{{{
 
     call s:step_num()
 endfunc "}}}
+call s:add_method('stdout_isnt')
 
 func! simpletap#stdout_like(Code, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
@@ -374,6 +437,7 @@ func! simpletap#stdout_like(Code, regex, ...) "{{{
 
     call s:step_num()
 endfunc "}}}
+call s:add_method('stdout_like')
 
 func! simpletap#stdout_unlike(Code, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
@@ -387,6 +451,7 @@ func! simpletap#stdout_unlike(Code, regex, ...) "{{{
 
     call s:step_num()
 endfunc "}}}
+call s:add_method('stdout_unlike')
 
 
 func! simpletap#diag(msg) "{{{
@@ -394,6 +459,7 @@ func! simpletap#diag(msg) "{{{
     echomsg '#' a:msg
     echohl None
 endfunc "}}}
+call s:add_method('diag')
 
 
 func! simpletap#pass() "{{{
