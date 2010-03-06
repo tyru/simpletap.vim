@@ -12,6 +12,19 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
+if !exists('g:simpletap_run_command')
+    let g:simpletap_run_command = 'SimpleTapRun'
+endif
+if !exists('g:simpletap_run_command_complete')
+    let g:simpletap_run_command_complete = ['dir']
+endif
+if g:simpletap_run_command != ''
+    execute
+    \   'command'
+    \   '-nargs=? -complete='.join(g:simpletap_run_command_complete, ',')
+    \   g:simpletap_run_command
+    \   'call simpletap#run(<f-args>)'
+endif
 
 " Restore 'cpoptions' {{{
 let &cpo = s:save_cpo

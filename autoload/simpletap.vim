@@ -340,10 +340,17 @@ endfunc "}}}
 
 " Autoload {{{
 
-func! simpletap#run() "{{{
+func! simpletap#run(...) "{{{
+    let dir = a:0 != 0 ? a:1 : g:simpletap#test_dir
+    let dir = expand(dir)
+    if !isdirectory(dir)
+        call s:warnf("'%s' is not directory.", dir)
+        return
+    endif
+
     let tested = 0
     call s:begin_test_once()
-    for t in s:glob(printf('%s/**/*.vim', g:simpletap#test_dir))
+    for t in s:glob(printf('%s/**/*.vim', dir))
         call s:begin_test(t)
         execute 'source' t
         call s:end_test(t)
