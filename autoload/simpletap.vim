@@ -38,6 +38,8 @@ let simpletap#like_ok_str = 'ok'
 let simpletap#like_not_ok_str = 'got: %s, expected like: %s'
 let simpletap#unlike_ok_str = 'ok'
 let simpletap#unlike_not_ok_str = 'got: %s, expected like not: %s'
+let simpletap#stdout_is_ok_str = 'ok'
+let simpletap#stdout_is_not_ok_str = 'got: %s, expected: %s'
 let simpletap#test_dir = '.'
 
 let s:current_test_num = 1
@@ -100,6 +102,29 @@ func! s:failed(testname, funcname, ...) "{{{
         \   )
         \)
     endif
+endfunc "}}}
+
+func! s:error(msg) "{{{
+    return "simpletap:" . a:msg
+endfunc "}}}
+
+func! s:get_output(Code) "{{{
+    redir => output
+
+    try
+        if type(a:Code) == type(function('tr'))
+            call a:Code()
+        elseif type(a:Code) == type("")
+            execute a:Code
+        else
+            throw s:error("type error")
+        endif
+
+        redir END
+        return substitute(output, '^\n', '', '')
+    finally
+        redir END
+    endtry
 endfunc "}}}
 
 
@@ -194,6 +219,19 @@ func! simpletap#exists_func(Fn, ...) "{{{
     catch /E120:/
         return 0
     endtry
+endfunc "}}}
+
+func! simpletap#stdout_is(Code, expected, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    let output = s:get_output(a:Code)
+    if s:equal(output, a:expected)
+        call s:passed(testname, 'stdout_is')
+    else
+        call s:failed(testname, 'stdout_is', output, a:expected)
+    endif
+
+    let s:current_test_num += 1
 endfunc "}}}
 
 func! simpletap#diag(msg) "{{{
