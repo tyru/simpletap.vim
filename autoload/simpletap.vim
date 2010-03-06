@@ -42,6 +42,7 @@ let simpletap#stdout_is_ok_str = 'ok'
 let simpletap#stdout_is_not_ok_str = 'got: %s, expected: %s'
 let simpletap#stdout_like_ok_str = 'ok'
 let simpletap#stdout_like_not_ok_str = 'got: %s, expected like: %s'
+let simpletap#silent = 1
 let simpletap#test_dir = '.'
 
 let s:current_test_num = 1
@@ -115,13 +116,17 @@ func! s:get_output(Code) "{{{
 
     try
         if type(a:Code) == type(function('tr'))
-            call a:Code()
+            let ex = 'call a:Code()'
         elseif type(a:Code) == type("")
-            execute a:Code
+            let ex = 'execute a:Code'
         else
             throw s:error("type error")
         endif
-
+        if g:simpletap#silent
+            silent execute ex
+        else
+            execute ex
+        endif
         redir END
         return substitute(output, '^\n', '', '')
     finally
