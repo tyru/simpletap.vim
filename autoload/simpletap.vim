@@ -232,7 +232,9 @@ endfunc "}}}
 
 func! s:end_test() "{{{
     let s:current_test_num = 1
+    execute 'echohl' g:simpletap_done_echohl
     echomsg 'Done.'
+    echohl None
 endfunc "}}}
 
 " }}}

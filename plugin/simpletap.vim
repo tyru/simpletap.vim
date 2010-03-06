@@ -19,6 +19,9 @@ endif
 if !exists('g:simpletap_error_echohl')
     let g:simpletap_error_echohl = 'WarningMsg'
 endif
+if !exists('g:simpletap_done_echohl')
+    let g:simpletap_done_echohl = 'Underlined'
+endif
 " }}}
 
 
