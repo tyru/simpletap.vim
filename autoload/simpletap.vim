@@ -217,6 +217,15 @@ func! s:step_num() "{{{
     endif
 endfunc "}}}
 
+func! s:begin_test() "{{{
+    let s:current_test_num = 1
+endfunc "}}}
+
+func! s:end_test() "{{{
+    let s:current_test_num = 1
+    echomsg 'Done.'
+endfunc "}}}
+
 " }}}
 
 
@@ -275,7 +284,9 @@ func! simpletap#run() "{{{
     let tested = 0
     for t in s:glob(printf('%s/*.vim', g:simpletap#test_dir))
         echomsg 'begin test:' t
+        call s:begin_test()
         execute 'source' t
+        call s:end_test()
         let tested = 1
     endfor
 
@@ -456,27 +467,9 @@ call s:add_method('diag')
 
 " }}}
 
-" For commands {{{
-
-func! s:cmd_begin_test() "{{{
-    let s:current_test_num = 1
-endfunc "}}}
-
-func! s:cmd_end_test() "{{{
-    let s:current_test_num = 1
-    echomsg 'Done.'
-endfunc "}}}
-
-" }}}
-
 " }}}
 
 " Commands {{{
-command! TestBegin
-\   call s:cmd_begin_test()
-
-command! TestEnd
-\   call s:cmd_end_test()
 " }}}
 
 call s:initialize_once()
