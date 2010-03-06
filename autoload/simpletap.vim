@@ -120,6 +120,7 @@ func! s:initialize_once() "{{{
     call s:def('echohl_error', 'WarningMsg')
     call s:def('echohl_begin', 'None')
     call s:def('echohl_done', 'Underlined')
+    call s:def('recursive', 0)
 
     delfunc s:varname
     delfunc s:def
@@ -347,10 +348,15 @@ func! simpletap#run(...) "{{{
         call s:warnf("'%s' is not directory.", dir)
         return
     endif
+    if g:simpletap#recursive
+        let pat = printf('%s/**/*.vim', dir)
+    else
+        let pat = printf('%s/*.vim', dir)
+    endif
 
     let tested = 0
     call s:begin_test_once()
-    for t in s:glob(printf('%s/**/*.vim', dir))
+    for t in s:glob(pat)
         call s:begin_test(t)
         execute 'source' t
         call s:end_test(t)
