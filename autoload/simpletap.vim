@@ -258,7 +258,7 @@ func! simpletap#unlike(got, regex, ...) "{{{
     call s:step_num()
 endfunc "}}}
 
-func! simpletap#raise_ok(command, regex, ...) "{{{
+func! simpletap#throws_ok(command, regex, ...) "{{{
     try
         execute a:command
         call call('simpletap#ok', [0] + a:000)
