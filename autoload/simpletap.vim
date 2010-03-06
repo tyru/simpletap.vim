@@ -24,7 +24,6 @@ set cpo&vim
 " - Capture output of Ex command.
 " - Add command macros.
 " - Add simpletap#xxx_not() functions.
-" - plugin/simpletap.vim
 
 
 " Variables {{{
@@ -46,7 +45,7 @@ let s:current_test_num = 1
 " Functions {{{
 
 func! simpletap#load() "{{{
-    " Dummy function to load this file
+    runtime! plugin/simpletap.vim
 endfunc "}}}
 
 
