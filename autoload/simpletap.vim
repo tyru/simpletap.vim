@@ -402,9 +402,15 @@ endfunc "}}}
 call s:add_method('unlike')
 
 
-func! simpletap#throws_ok(command, regex, ...) "{{{
+func! simpletap#throws_ok(Code, regex, ...) "{{{
     try
-        execute a:command
+        if type(a:Code) == type(function("tr"))
+            call a:Code()
+        elseif type(a:Code) == type("")
+            execute a:Code
+        else
+            throw s:error("type error")
+        endif
         call call('simpletap#ok', [0] + a:000)
     catch
         if v:exception =~# a:regex
