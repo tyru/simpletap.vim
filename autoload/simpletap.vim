@@ -50,6 +50,8 @@ func! s:initialize_once() "{{{
     call s:def('failed_ok', 'NOT ok')
     call s:def('passed_is', 'ok')
     call s:def('failed_is', 'got: %s, expected: %s')
+    call s:def('passed_isnt', 'ok')
+    call s:def('failed_isnt', 'got: %s, expected not: %s')
     call s:def('passed_like', 'ok')
     call s:def('failed_like', 'got: %s, expected like: %s')
     call s:def('passed_unlike', 'ok')
@@ -189,6 +191,18 @@ func! simpletap#is(got, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:equal(a:got, a:expected)
+        call s:passed(testname, 'is')
+    else
+        call s:failed(testname, 'is', a:got, a:expected)
+    endif
+
+    call s:step_num()
+endfunc "}}}
+
+func! simpletap#isnt(got, expected, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    if !s:equal(a:got, a:expected)
         call s:passed(testname, 'is')
     else
         call s:failed(testname, 'is', a:got, a:expected)
