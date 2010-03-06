@@ -40,6 +40,8 @@ let simpletap#unlike_ok_str = 'ok'
 let simpletap#unlike_not_ok_str = 'got: %s, expected like not: %s'
 let simpletap#stdout_is_ok_str = 'ok'
 let simpletap#stdout_is_not_ok_str = 'got: %s, expected: %s'
+let simpletap#stdout_like_ok_str = 'ok'
+let simpletap#stdout_like_not_ok_str = 'got: %s, expected like: %s'
 let simpletap#test_dir = '.'
 
 let s:current_test_num = 1
@@ -229,6 +231,19 @@ func! simpletap#stdout_is(Code, expected, ...) "{{{
         call s:passed(testname, 'stdout_is')
     else
         call s:failed(testname, 'stdout_is', output, a:expected)
+    endif
+
+    let s:current_test_num += 1
+endfunc "}}}
+
+func! simpletap#stdout_like(Code, regex, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    let output = s:get_output(a:Code)
+    if s:like(output, a:regex)
+        call s:passed(testname, 'stdout_like')
+    else
+        call s:failed(testname, 'stdout_like', output, a:regex)
     endif
 
     let s:current_test_num += 1
