@@ -283,7 +283,7 @@ endfunc "}}}
 
 func! simpletap#run() "{{{
     let tested = 0
-    for t in s:glob(printf('%s/*.vim', g:simpletap#test_dir))
+    for t in s:glob(printf('%s/**/*.vim', g:simpletap#test_dir))
         echomsg 'begin test:' t
         call s:begin_test()
         execute 'source' t
