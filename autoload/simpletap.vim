@@ -144,11 +144,11 @@ func! simpletap#exists_func(Fn, ...) "{{{
         return 1
     catch /E116:/
         return 0
-    catch /E117:/    " 未知の関数です
+    catch /E117:/    " Unknown function: ...
         return 0
     catch /E118:/
         return 0
-    catch /E119:/    " 関数の引数が少な過ぎます
+    catch /E119:/    " Not enough arguments for function: ...
         return 1
     catch /E120:/
         return 0
