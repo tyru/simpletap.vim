@@ -32,6 +32,7 @@ set cpo&vim
 "   - eq_set()
 "   - stderr_*()
 "     - I don't know how to implement
+" - test
 "
 " Needless:
 " - can_ok()
