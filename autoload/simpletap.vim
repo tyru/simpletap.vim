@@ -117,6 +117,8 @@ func! s:initialize_once() "{{{
 endfunc "}}}
 
 
+" Utilities {{{
+
 func! s:warn(...) "{{{
     echohl WarningMsg
     echomsg join(a:000, ' ')
@@ -209,6 +211,10 @@ func! s:step_num() "{{{
     endif
 endfunc "}}}
 
+" }}}
+
+
+" Autoload {{{
 
 func! simpletap#run() "{{{
     let tested = 0
@@ -223,6 +229,7 @@ func! simpletap#run() "{{{
     endif
 endfunc "}}}
 
+
 func! simpletap#ok(cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
@@ -234,6 +241,7 @@ func! simpletap#ok(cond, ...) "{{{
 
     call s:step_num()
 endfunc "}}}
+
 
 func! simpletap#is(got, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
@@ -259,6 +267,7 @@ func! simpletap#isnt(got, expected, ...) "{{{
     call s:step_num()
 endfunc "}}}
 
+
 func! simpletap#like(got, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
@@ -283,6 +292,7 @@ func! simpletap#unlike(got, regex, ...) "{{{
     call s:step_num()
 endfunc "}}}
 
+
 func! simpletap#throws_ok(command, regex, ...) "{{{
     try
         execute a:command
@@ -295,6 +305,7 @@ func! simpletap#throws_ok(command, regex, ...) "{{{
         endif
     endtry
 endfunc "}}}
+
 
 func! simpletap#exists_func(Fn, ...) "{{{
     let args = a:0 != 0 ? a:1 : []
@@ -314,6 +325,7 @@ func! simpletap#exists_func(Fn, ...) "{{{
         return 0
     endtry
 endfunc "}}}
+
 
 func! simpletap#stdout_is(Code, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
@@ -367,12 +379,16 @@ func! simpletap#stdout_unlike(Code, regex, ...) "{{{
     call s:step_num()
 endfunc "}}}
 
+
 func! simpletap#diag(msg) "{{{
     echohl Comment
     echomsg '#' a:msg
     echohl None
 endfunc "}}}
 
+" }}}
+
+" For commands {{{
 
 func! s:cmd_begin_test() "{{{
     let s:current_test_num = 1
@@ -382,6 +398,9 @@ func! s:cmd_end_test() "{{{
     let s:current_test_num = 1
     echomsg 'Done.'
 endfunc "}}}
+
+" }}}
+
 " }}}
 
 " Commands {{{
