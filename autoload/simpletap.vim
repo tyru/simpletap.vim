@@ -25,7 +25,6 @@ set cpo&vim
 "   - Add function to define autoload functions.
 " - Add global vars to define echohl
 " - functions
-"   - cmp_ok()
 "   - is_deeply()
 "   - done_testing()
 "   - plan()
@@ -84,6 +83,7 @@ func! s:initialize_once() "{{{
     \   'pass_fmt',
     \   {
     \       'ok': 'ok',
+    \       'cmp_ok': 'ok',
     \       'is': 'ok',
     \       'isnt': 'ok',
     \       'like': 'ok',
@@ -98,6 +98,7 @@ func! s:initialize_once() "{{{
     \   'fail_fmt',
     \   {
     \       'ok': 'NOT ok',
+    \       'cmp_ok': 'got: %s, expected: %s',
     \       'is': 'got: %s, expected: %s',
     \       'isnt': 'got: %s, expected not: %s',
     \       'like': 'got: %s, expected like: %s',
@@ -140,6 +141,10 @@ func! s:like(got, regex) "{{{
     return type(a:got) == type("")
     \   && type(a:regex) == type("")
     \   && a:got =~# a:regex
+endfunc "}}}
+
+func! s:cmp(l, op, r) "{{{
+    return eval(printf('a:l %s a:r', a:op))
 endfunc "}}}
 
 func! s:passed(testname, funcname) "{{{
@@ -305,6 +310,20 @@ func! simpletap#ok(cond, ...) "{{{
     call s:step_num()
 endfunc "}}}
 call s:add_method('ok')
+
+
+func! simpletap#cmp_ok(got, op, expected, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    if s:cmp(a:got, a:op, a:expected)
+        call s:passed(testname, 'cmp_ok')
+    else
+        call s:failed(testname, 'cmp_ok', a:got, a:expected)
+    endif
+
+    call s:step_num()
+endfunc "}}}
+call s:add_method('cmp_ok')
 
 
 func! simpletap#is(got, expected, ...) "{{{
