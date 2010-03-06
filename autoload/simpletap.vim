@@ -53,6 +53,42 @@ func! s:equal(l, r) "{{{
     \   && a:l ==# a:r
 endfunc "}}}
 
+func! s:passed(testname, funcname) "{{{
+    echomsg printf(
+    \   '%d. %s ... %s',
+    \   s:current_test_num,
+    \   a:testname,
+    \   g:simpletap#{a:funcname}_ok_str
+    \)
+endfunc "}}}
+
+func! s:failed(testname, funcname, ...) "{{{
+    if a:0 == 0
+        call s:warn(
+        \   printf(
+        \      '%d. %s ... %s',
+        \      s:current_test_num,
+        \      a:testname,
+        \      g:simpletap#{a:funcname}_not_ok_str
+        \   )
+        \)
+    else
+        let got = a:1
+        let expected = a:2
+        call s:warn(
+        \   printf(
+        \      '%d. %s ... %s',
+        \      s:current_test_num,
+        \      a:testname,
+        \      printf(
+        \          g:simpletap#{a:funcname}_not_ok_str,
+        \          string(got),
+        \          string(expected))
+        \   )
+        \)
+    endif
+endfunc "}}}
+
 
 func! simpletap#run() "{{{
     let tested = 0
@@ -71,21 +107,9 @@ func! simpletap#ok(cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if a:cond
-        echomsg printf(
-        \   '%d. %s ... %s',
-        \   s:current_test_num,
-        \   testname,
-        \   g:simpletap#ok_ok_str
-        \)
+        call s:passed(testname, 'ok')
     else
-        call s:warn(
-        \   printf(
-        \      '%d. %s ... %s',
-        \      s:current_test_num,
-        \      testname,
-        \      g:simpletap#ok_not_ok_str
-        \   )
-        \)
+        call s:failed(testname, 'ok')
     endif
 
     let s:current_test_num += 1
@@ -95,24 +119,9 @@ func! simpletap#is(got, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:equal(a:got, a:expected)
-        echomsg printf(
-        \   '%d. %s ... %s',
-        \   s:current_test_num,
-        \   testname,
-        \   g:simpletap#is_ok_str
-        \)
+        call s:passed(testname, 'is')
     else
-        call s:warn(
-        \   printf(
-        \      '%d. %s ... %s',
-        \      s:current_test_num,
-        \      testname,
-        \      printf(
-        \          g:simpletap#is_not_ok_str,
-        \          string(a:got),
-        \          string(a:expected))
-        \   )
-        \)
+        call s:failed(testname, 'is', a:got, a:expected)
     endif
 
     let s:current_test_num += 1
