@@ -22,7 +22,6 @@ set cpo&vim
 " TODO
 " - OO interface
 " - Add command macros.
-" - Add simpletap#xxx_not() functions.
 " - Put format string to dictionary.
 " - s:get_func_varnames()
 "   - Add function to define autoload functions.
@@ -46,6 +45,8 @@ set cpo&vim
 " - can_ok()
 "   - Use has_key() and ok()
 " - isa_ok()
+" - not_throws_ok()
+"   - Use ok() in :try, not in :catch.
 
 
 " Variables {{{
