@@ -134,6 +134,10 @@ endfunc "}}}
 
 func! s:equal(l, r) "{{{
     return type(a:l) == type(a:r)
+    \   && type(a:l) != type({})
+    \   && type(a:l) != type([])
+    \   && type(a:r) != type({})
+    \   && type(a:r) != type([])
     \   && a:l ==# a:r
 endfunc "}}}
 
