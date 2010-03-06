@@ -116,6 +116,10 @@ func! s:initialize_once() "{{{
     \)
     call s:def('silent', 1)
     call s:def('test_dir', '.')
+    call s:def('echohl_diag', 'Comment')
+    call s:def('echohl_error', 'WarningMsg')
+    call s:def('echohl_begin', 'None')
+    call s:def('echohl_done', 'Underlined')
 
     delfunc s:varname
     delfunc s:def
@@ -128,7 +132,7 @@ endfunc "}}}
 " Utilities {{{
 
 func! s:warn(...) "{{{
-    execute 'echohl' g:simpletap_error_echohl
+    execute 'echohl' g:simpletap#echohl_error
     echomsg join(a:000, ' ')
     echohl None
 endfunc "}}}
@@ -260,7 +264,7 @@ func! s:begin_test(file) "{{{
     let s:done_testing = 0
     let s:test_result = []
 
-    execute 'echohl' g:simpletap_begin_echohl
+    execute 'echohl' g:simpletap#echohl_begin
     echomsg 'Begin' '...' a:file
     echohl None
 endfunc "}}}
@@ -276,7 +280,7 @@ func! s:end_test(file) "{{{
     elseif !empty(failed_tests)
         call s:warnf('failed %d test(s).', len(failed_tests))
     else
-        execute 'echohl' g:simpletap_done_echohl
+        execute 'echohl' g:simpletap#echohl_done
         echomsg 'Done.'
         echohl None
     endif
@@ -551,7 +555,7 @@ call s:add_method('stdout_unlike')
 
 
 func! simpletap#diag(msg) "{{{
-    execute 'echohl' g:simpletap_diag_echohl
+    execute 'echohl' g:simpletap#echohl_diag
     echomsg '#' a:msg
     echohl None
 endfunc "}}}
