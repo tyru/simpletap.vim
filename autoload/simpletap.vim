@@ -19,7 +19,10 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-" TODO OO interface
+" TODO
+" - OO interface
+" - Capture output of Ex command.
+" - Add command macros.
 
 
 " Variables {{{
