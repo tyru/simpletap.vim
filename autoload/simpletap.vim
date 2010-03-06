@@ -23,6 +23,9 @@ set cpo&vim
 " - OO interface
 " - Capture output of Ex command.
 " - Add command macros.
+" - Add simpletap#xxx_not() functions.
+" - simpletap#load()
+" - plugin/simpletap.vim
 
 
 " Variables {{{
