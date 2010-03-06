@@ -31,8 +31,6 @@ set cpo&vim
 "   - is_deeply()
 "   - done_testing()
 "   - plan()
-"   - pass()
-"   - fail()
 "   - todo_skip()
 "   - subtest
 "   - eq_array()
@@ -464,6 +462,17 @@ func! simpletap#diag(msg) "{{{
     echohl None
 endfunc "}}}
 call s:add_method('diag')
+
+
+func! simpletap#pass() "{{{
+    return simpletap#ok(1)
+endfunc "}}}
+call s:add_method('pass')
+
+func! simpletap#fail() "{{{
+    return simpletap#ok(0)
+endfunc "}}}
+call s:add_method('fail')
 
 " }}}
 
