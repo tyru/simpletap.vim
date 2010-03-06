@@ -159,6 +159,12 @@ func! s:cmp(l, op, r) "{{{
     return eval(printf('a:l %s a:r', a:op))
 endfunc "}}}
 
+func! s:assert(cond) "{{{
+    if !a:cond
+        throw s:error("assertion failure")
+    endif
+endfunc "}}}
+
 func! s:passed(testname, funcname) "{{{
     echomsg printf(
     \   '%d. %s ... %s',
