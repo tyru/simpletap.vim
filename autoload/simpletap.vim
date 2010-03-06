@@ -22,7 +22,6 @@ set cpo&vim
 " TODO
 " - Add command macros.
 " - functions
-"   - done_testing()
 "   - plan()
 "   - todo_skip()
 "   - subtest
@@ -44,6 +43,7 @@ set cpo&vim
 " Variables {{{
 let s:current_test_num = 1
 let s:dont_change_current_num = 0
+let s:done_testing = 0
 " }}}
 
 " Functions {{{
@@ -125,6 +125,10 @@ func! s:warn(...) "{{{
     execute 'echohl' g:simpletap_error_echohl
     echomsg join(a:000, ' ')
     echohl None
+endfunc "}}}
+
+func! s:warnf(...) "{{{
+    call call('s:warn', [call('printf', a:000)])
 endfunc "}}}
 
 func! s:glob(expr) "{{{
@@ -226,15 +230,34 @@ func! s:step_num() "{{{
     endif
 endfunc "}}}
 
-func! s:begin_test() "{{{
-    let s:current_test_num = 1
+func! s:begin_test_once() "{{{
+    command!
+    \   Done
+    \   let s:done_testing = 1
 endfunc "}}}
 
-func! s:end_test() "{{{
+func! s:begin_test(file) "{{{
     let s:current_test_num = 1
-    execute 'echohl' g:simpletap_done_echohl
-    echomsg 'Done.'
-    echohl None
+    let s:done_testing = 0
+
+    echomsg 'Begin' '...' a:file
+endfunc "}}}
+
+func! s:end_test_once() "{{{
+    delcommand Done
+endfunc "}}}
+
+func! s:end_test(file) "{{{
+    if s:done_testing
+        execute 'echohl' g:simpletap_done_echohl
+        echomsg 'Done.'
+        echohl None
+    else
+        call s:warnf("!!! test '%s' has not done properly !!!", a:file)
+    endif
+
+    let s:current_test_num = 1
+    let s:done_testing = 0
 endfunc "}}}
 
 " }}}
@@ -293,13 +316,15 @@ endfunc "}}}
 
 func! simpletap#run() "{{{
     let tested = 0
+    call s:begin_test_once()
     for t in s:glob(printf('%s/**/*.vim', g:simpletap#test_dir))
-        echomsg 'begin test:' t
-        call s:begin_test()
+        call s:begin_test(t)
         execute 'source' t
-        call s:end_test()
+        call s:end_test(t)
+
         let tested = 1
     endfor
+    call s:end_test_once()
 
     if !tested
         call s:warn('no tests to run.')
