@@ -21,7 +21,6 @@ set cpo&vim
 
 " TODO
 " - OO interface
-" - Capture output of Ex command.
 " - Add command macros.
 " - Add simpletap#xxx_not() functions.
 
@@ -35,6 +34,36 @@ let s:dont_change_current_num = 0
 
 func! simpletap#load() "{{{
     runtime! plugin/simpletap.vim
+endfunc "}}}
+
+func! s:initialize_once() "{{{
+    call simpletap#load()
+
+    func! s:def(varname, default) "{{{
+        let v = 'g:simpletap#' . a:varname
+        if !exists(v)
+            let {v} = a:default
+        endif
+    endfunc "}}}
+
+    call s:def('passed_ok', 'ok')
+    call s:def('failed_ok', 'NOT ok')
+    call s:def('passed_is', 'ok')
+    call s:def('failed_is', 'got: %s, expected: %s')
+    call s:def('passed_like', 'ok')
+    call s:def('failed_like', 'got: %s, expected like: %s')
+    call s:def('passed_unlike', 'ok')
+    call s:def('failed_unlike', 'got: %s, expected like not: %s')
+    call s:def('passed_stdout_is', 'ok')
+    call s:def('failed_stdout_is', 'got: %s, expected: %s')
+    call s:def('passed_stdout_like', 'ok')
+    call s:def('failed_stdout_like', 'got: %s, expected like: %s')
+    call s:def('passed_stdout_unlike', 'ok')
+    call s:def('failed_stdout_unlike', 'got: %s, expected like not: %s')
+    call s:def('silent', 1)
+    call s:def('test_dir', '.')
+
+    delfunc s:def
 endfunc "}}}
 
 
@@ -128,36 +157,6 @@ func! s:step_num() "{{{
     if !s:dont_change_current_num
         let s:current_test_num += 1
     endif
-endfunc "}}}
-
-func! s:initialize_once() "{{{
-    call simpletap#load()
-
-    func! s:def(varname, default) "{{{
-        let v = 'g:simpletap#' . a:varname
-        if !exists(v)
-            let {v} = a:default
-        endif
-    endfunc "}}}
-
-    call s:def('passed_ok', 'ok')
-    call s:def('failed_ok', 'NOT ok')
-    call s:def('passed_is', 'ok')
-    call s:def('failed_is', 'got: %s, expected: %s')
-    call s:def('passed_like', 'ok')
-    call s:def('failed_like', 'got: %s, expected like: %s')
-    call s:def('passed_unlike', 'ok')
-    call s:def('failed_unlike', 'got: %s, expected like not: %s')
-    call s:def('passed_stdout_is', 'ok')
-    call s:def('failed_stdout_is', 'got: %s, expected: %s')
-    call s:def('passed_stdout_like', 'ok')
-    call s:def('failed_stdout_like', 'got: %s, expected like: %s')
-    call s:def('passed_stdout_unlike', 'ok')
-    call s:def('failed_stdout_unlike', 'got: %s, expected like not: %s')
-    call s:def('silent', 1)
-    call s:def('test_dir', '.')
-
-    delfunc s:def
 endfunc "}}}
 
 
