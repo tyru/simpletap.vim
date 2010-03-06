@@ -240,7 +240,9 @@ func! s:begin_test(file) "{{{
     let s:current_test_num = 1
     let s:done_testing = 0
 
+    execute 'echohl' g:simpletap_begin_echohl
     echomsg 'Begin' '...' a:file
+    echohl None
 endfunc "}}}
 
 func! s:end_test_once() "{{{

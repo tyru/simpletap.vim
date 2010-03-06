@@ -22,6 +22,9 @@ endif
 if !exists('g:simpletap_done_echohl')
     let g:simpletap_done_echohl = 'Underlined'
 endif
+if !exists('g:simpletap_begin_echohl')
+    let g:simpletap_begin_echohl = 'None'
+endif
 " }}}
 
 
