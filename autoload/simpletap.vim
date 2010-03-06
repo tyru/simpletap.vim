@@ -21,11 +21,8 @@ set cpo&vim
 
 " TODO
 " - Add command macros.
-" - s:get_func_varnames()
-"   - Add function to define autoload functions.
 " - Add global vars to define echohl
 " - functions
-"   - is_deeply()
 "   - done_testing()
 "   - plan()
 "   - todo_skip()
