@@ -28,18 +28,18 @@ set cpo&vim
 
 " Variables {{{
 
-let simpletap#ok_ok_str = 'ok'
-let simpletap#ok_not_ok_str = 'NOT ok'
-let simpletap#is_ok_str = 'ok'
-let simpletap#is_not_ok_str = 'got: %s, expected: %s'
-let simpletap#like_ok_str = 'ok'
-let simpletap#like_not_ok_str = 'got: %s, expected like: %s'
-let simpletap#unlike_ok_str = 'ok'
-let simpletap#unlike_not_ok_str = 'got: %s, expected like not: %s'
-let simpletap#stdout_is_ok_str = 'ok'
-let simpletap#stdout_is_not_ok_str = 'got: %s, expected: %s'
-let simpletap#stdout_like_ok_str = 'ok'
-let simpletap#stdout_like_not_ok_str = 'got: %s, expected like: %s'
+let simpletap#passed_ok = 'ok'
+let simpletap#failed_ok = 'NOT ok'
+let simpletap#passed_is = 'ok'
+let simpletap#failed_is = 'got: %s, expected: %s'
+let simpletap#passed_like = 'ok'
+let simpletap#failed_like = 'got: %s, expected like: %s'
+let simpletap#passed_unlike = 'ok'
+let simpletap#failed_unlike = 'got: %s, expected like not: %s'
+let simpletap#passed_stdout_is = 'ok'
+let simpletap#failed_stdout_is = 'got: %s, expected: %s'
+let simpletap#passed_stdout_like = 'ok'
+let simpletap#failed_stdout_like = 'got: %s, expected like: %s'
 let simpletap#silent = 1
 let simpletap#test_dir = '.'
 
@@ -80,7 +80,7 @@ func! s:passed(testname, funcname) "{{{
     \   '%d. %s ... %s',
     \   s:current_test_num,
     \   a:testname,
-    \   g:simpletap#{a:funcname}_ok_str
+    \   g:simpletap#passed_{a:funcname}
     \)
 endfunc "}}}
 
@@ -91,7 +91,7 @@ func! s:failed(testname, funcname, ...) "{{{
         \      '%d. %s ... %s',
         \      s:current_test_num,
         \      a:testname,
-        \      g:simpletap#{a:funcname}_not_ok_str
+        \      g:simpletap#failed_{a:funcname},
         \   )
         \)
     else
@@ -103,7 +103,7 @@ func! s:failed(testname, funcname, ...) "{{{
         \      s:current_test_num,
         \      a:testname,
         \      printf(
-        \          g:simpletap#{a:funcname}_not_ok_str,
+        \          g:simpletap#failed_{a:funcname},
         \          string(got),
         \          string(expected))
         \   )
