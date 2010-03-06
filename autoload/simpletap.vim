@@ -31,6 +31,7 @@ set cpo&vim
 "   - stderr_*()
 "     - I don't know how to implement
 " - test
+" - Show more info when test(s) failed.
 "
 " Needless:
 " - can_ok()
