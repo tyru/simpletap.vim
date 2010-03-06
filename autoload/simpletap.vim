@@ -122,7 +122,7 @@ endfunc "}}}
 " Utilities {{{
 
 func! s:warn(...) "{{{
-    echohl WarningMsg
+    execute 'echohl' g:simpletap_error_echohl
     echomsg join(a:000, ' ')
     echohl None
 endfunc "}}}

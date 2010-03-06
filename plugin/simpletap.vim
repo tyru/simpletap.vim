@@ -16,6 +16,9 @@ set cpo&vim
 if !exists('g:simpletap_diag_echohl')
     let g:simpletap_diag_echohl = 'Comment'
 endif
+if !exists('g:simpletap_error_echohl')
+    let g:simpletap_error_echohl = 'WarningMsg'
+endif
 " }}}
 
 
