@@ -34,6 +34,10 @@ let simpletap#ok_ok_str = 'ok'
 let simpletap#ok_not_ok_str = 'NOT ok'
 let simpletap#is_ok_str = 'ok'
 let simpletap#is_not_ok_str = 'got: %s, expected: %s'
+let simpletap#like_ok_str = 'ok'
+let simpletap#like_not_ok_str = 'got: %s, expected like: %s'
+let simpletap#unlike_ok_str = 'ok'
+let simpletap#unlike_not_ok_str = 'got: %s, expected like not: %s'
 let simpletap#test_dir = '.'
 
 let s:current_test_num = 1
@@ -54,6 +58,12 @@ endfunc "}}}
 func! s:equal(l, r) "{{{
     return type(a:l) == type(a:r)
     \   && a:l ==# a:r
+endfunc "}}}
+
+func! s:like(got, regex) "{{{
+    return type(a:got) == type("")
+    \   && type(a:regex) == type("")
+    \   && a:got =~# a:regex
 endfunc "}}}
 
 func! s:passed(testname, funcname) "{{{
@@ -125,6 +135,30 @@ func! simpletap#is(got, expected, ...) "{{{
         call s:passed(testname, 'is')
     else
         call s:failed(testname, 'is', a:got, a:expected)
+    endif
+
+    let s:current_test_num += 1
+endfunc "}}}
+
+func! simpletap#like(got, regex, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    if s:like(a:got, a:regex)
+        call s:passed(testname, 'like')
+    else
+        call s:failed(testname, 'like', a:got, a:regex)
+    endif
+
+    let s:current_test_num += 1
+endfunc "}}}
+
+func! simpletap#unlike(got, regex, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    if !s:like(a:got, a:regex)
+        call s:passed(testname, 'unlike')
+    else
+        call s:failed(testname, 'unlike', a:got, a:regex)
     endif
 
     let s:current_test_num += 1
