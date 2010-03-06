@@ -33,6 +33,8 @@ let simpletap#is_ok_str = 'ok'
 let simpletap#is_not_ok_str = 'got: %s, expected: %s'
 let simpletap#like_ok_str = 'ok'
 let simpletap#like_not_ok_str = 'got: %s, expected like: %s'
+let simpletap#unlike_ok_str = 'ok'
+let simpletap#unlike_not_ok_str = 'got: %s, expected like not: %s'
 let simpletap#test_dir = '.'
 
 let s:current_test_num = 1
@@ -142,6 +144,18 @@ func! simpletap#like(got, regex, ...) "{{{
         call s:passed(testname, 'like')
     else
         call s:failed(testname, 'like', a:got, a:regex)
+    endif
+
+    let s:current_test_num += 1
+endfunc "}}}
+
+func! simpletap#unlike(got, regex, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    if !s:like(a:got, a:regex)
+        call s:passed(testname, 'unlike')
+    else
+        call s:failed(testname, 'unlike', a:got, a:regex)
     endif
 
     let s:current_test_num += 1
