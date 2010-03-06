@@ -63,33 +63,55 @@ endfunc "}}}
 func! s:initialize_once() "{{{
     call simpletap#load()
 
+    func! s:varname(v) "{{{
+        return 'g:simpletap#' . a:v
+    endfunc "}}}
     func! s:def(varname, default) "{{{
-        let v = 'g:simpletap#' . a:varname
+        let v = s:varname(a:varname)
         if !exists(v)
             let {v} = a:default
         endif
     endfunc "}}}
+    func! s:def_hash(varname, default) "{{{
+        let v = s:varname(a:varname)
+        if !exists(v)
+            let {v} = {}
+        endif
+        call extend({v}, a:default, 'keep')
+    endfunc "}}}
 
-    call s:def('passed_ok', 'ok')
-    call s:def('failed_ok', 'NOT ok')
-    call s:def('passed_is', 'ok')
-    call s:def('failed_is', 'got: %s, expected: %s')
-    call s:def('passed_isnt', 'ok')
-    call s:def('failed_isnt', 'got: %s, expected not: %s')
-    call s:def('passed_like', 'ok')
-    call s:def('failed_like', 'got: %s, expected like: %s')
-    call s:def('passed_unlike', 'ok')
-    call s:def('failed_unlike', 'got: %s, expected like not: %s')
-    call s:def('passed_stdout_is', 'ok')
-    call s:def('failed_stdout_is', 'got: %s, expected: %s')
-    call s:def('passed_stdout_like', 'ok')
-    call s:def('failed_stdout_like', 'got: %s, expected like: %s')
-    call s:def('passed_stdout_unlike', 'ok')
-    call s:def('failed_stdout_unlike', 'got: %s, expected like not: %s')
+    call s:def_hash(
+    \   'pass_fmt',
+    \   {
+    \       'ok': 'ok',
+    \       'is': 'ok',
+    \       'isnt': 'ok',
+    \       'like': 'ok',
+    \       'unlike': 'ok',
+    \       'stdout_is': 'ok',
+    \       'stdout_like': 'ok',
+    \       'stdout_unlike': 'ok',
+    \   },
+    \)
+    call s:def_hash(
+    \   'fail_fmt',
+    \   {
+    \       'ok': 'NOT ok',
+    \       'is': 'got: %s, expected: %s',
+    \       'isnt': 'got: %s, expected not: %s',
+    \       'like': 'got: %s, expected like: %s',
+    \       'unlike': 'got: %s, expected like not: %s',
+    \       'stdout_is': 'got: %s, expected: %s',
+    \       'stdout_like': 'got: %s, expected like: %s',
+    \       'stdout_unlike': 'got: %s, expected like not: %s',
+    \   },
+    \)
     call s:def('silent', 1)
     call s:def('test_dir', '.')
 
+    delfunc s:varname
     delfunc s:def
+    delfunc s:def_hash
 endfunc "}}}
 
 
@@ -119,7 +141,7 @@ func! s:passed(testname, funcname) "{{{
     \   '%d. %s ... %s',
     \   s:current_test_num,
     \   a:testname,
-    \   g:simpletap#passed_{a:funcname}
+    \   g:simpletap#pass_fmt[a:funcname]
     \)
 endfunc "}}}
 
@@ -130,7 +152,7 @@ func! s:failed(testname, funcname, ...) "{{{
         \      '%d. %s ... %s',
         \      s:current_test_num,
         \      a:testname,
-        \      g:simpletap#failed_{a:funcname},
+        \      g:simpletap#fail_fmt[a:funcname]
         \   )
         \)
     else
@@ -142,7 +164,7 @@ func! s:failed(testname, funcname, ...) "{{{
         \      s:current_test_num,
         \      a:testname,
         \      printf(
-        \          g:simpletap#failed_{a:funcname},
+        \          g:simpletap#fail_fmt[a:funcname],
         \          string(got),
         \          string(expected))
         \   )
