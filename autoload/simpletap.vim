@@ -23,6 +23,29 @@ set cpo&vim
 " - OO interface
 " - Add command macros.
 " - Add simpletap#xxx_not() functions.
+" - Put format string to dictionary.
+" - s:get_func_varnames()
+"   - Add function to define autoload functions.
+" - Add global vars to define echohl
+" - functions
+"   - cmp_ok()
+"   - is_deeply()
+"   - done_testing()
+"   - plan()
+"   - pass()
+"   - fail()
+"   - todo_skip()
+"   - subtest
+"   - eq_array()
+"   - eq_hash()
+"   - eq_set()
+"   - stderr_*()
+"     - I don't know how to implement
+"
+" Needless:
+" - can_ok()
+"   - Use has_key() and ok()
+" - isa_ok()
 
 
 " Variables {{{
