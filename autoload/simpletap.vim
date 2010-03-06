@@ -20,9 +20,7 @@ set cpo&vim
 " }}}
 
 " TODO
-" - OO interface
 " - Add command macros.
-" - Put format string to dictionary.
 " - s:get_func_varnames()
 "   - Add function to define autoload functions.
 " - Add global vars to define echohl
