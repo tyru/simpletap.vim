@@ -41,6 +41,16 @@ func! s:warn(...) "{{{
     echohl None
 endfunc "}}}
 
+func! s:glob(expr) "{{{
+    return split(glob(a:expr), "\n")
+endfunc "}}}
+
+func! s:equal(l, r) "{{{
+    return type(a:l) == type(a:r)
+    \   && a:l ==# a:r
+endfunc "}}}
+
+
 func! simpletap#run() "{{{
     let tested = 0
     for t in s:glob(printf('%s/*.vim', g:simpletap#test_dir))
@@ -53,16 +63,6 @@ func! simpletap#run() "{{{
         call s:warn('no tests to run.')
     endif
 endfunc "}}}
-
-func! s:glob(expr) "{{{
-    return split(glob(a:expr), "\n")
-endfunc "}}}
-
-func! s:equal(l, r) "{{{
-    return type(a:l) == type(a:r)
-    \   && a:l ==# a:r
-endfunc "}}}
-
 
 func! simpletap#ok(cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
@@ -128,14 +128,6 @@ func! simpletap#raise_ok(command, regex, ...) "{{{
     endtry
 endfunc "}}}
 
-
-func! simpletap#diag(msg) "{{{
-    echohl Comment
-    echomsg '#' a:msg
-    echohl None
-endfunc "}}}
-
-
 func! simpletap#exists_func(Fn, ...) "{{{
     let args = a:0 != 0 ? a:1 : []
 
@@ -153,6 +145,12 @@ func! simpletap#exists_func(Fn, ...) "{{{
     catch /E120:/
         return 0
     endtry
+endfunc "}}}
+
+func! simpletap#diag(msg) "{{{
+    echohl Comment
+    echomsg '#' a:msg
+    echohl None
 endfunc "}}}
 
 
