@@ -44,6 +44,12 @@ set cpo&vim
 let s:current_test_num = 1
 let s:dont_change_current_num = 0
 let s:done_testing = 0
+let s:test_result = []
+
+let s:PASS = 1
+lockvar s:PASS
+let s:FAIL = 2
+lockvar s:FAIL
 " }}}
 
 " Functions {{{
@@ -172,6 +178,9 @@ func! s:passed(testname, funcname) "{{{
     \   a:testname,
     \   g:simpletap#pass_fmt[a:funcname]
     \)
+
+    call s:assert(s:current_test_num == len(s:test_result) + 1)
+    call add(s:test_result, s:PASS)
 endfunc "}}}
 
 func! s:failed(testname, funcname, ...) "{{{
@@ -199,6 +208,9 @@ func! s:failed(testname, funcname, ...) "{{{
         \   )
         \)
     endif
+
+    call s:assert(s:current_test_num == len(s:test_result) + 1)
+    call add(s:test_result, s:FAIL)
 endfunc "}}}
 
 func! s:error(msg) "{{{
@@ -245,6 +257,7 @@ endfunc "}}}
 func! s:begin_test(file) "{{{
     let s:current_test_num = 1
     let s:done_testing = 0
+    let s:test_result = []
 
     execute 'echohl' g:simpletap_begin_echohl
     echomsg 'Begin' '...' a:file
@@ -256,12 +269,16 @@ func! s:end_test_once() "{{{
 endfunc "}}}
 
 func! s:end_test(file) "{{{
-    if s:done_testing
+    let failed_tests = filter(copy(s:test_result), 'v:val ==# s:FAIL')
+    if !s:done_testing
+        call s:warnf("!!! test '%s' has not done properly !!!", a:file)
+    elseif !empty(failed_tests)
+        " TODO Global variable.
+        echomsg printf('failed %d test(s).', len(failed_tests))
+    else
         execute 'echohl' g:simpletap_done_echohl
         echomsg 'Done.'
         echohl None
-    else
-        call s:warnf("!!! test '%s' has not done properly !!!", a:file)
     endif
 
     let s:current_test_num = 1
