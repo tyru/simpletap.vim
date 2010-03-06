@@ -13,8 +13,8 @@ set cpo&vim
 " }}}
 
 " Global Variables {{{
-if !exists('g:simpletap_debug')
-    let g:simpletap_debug = 0
+if !exists('g:simpletap_diag_echohl')
+    let g:simpletap_diag_echohl = 'Comment'
 endif
 " }}}
 

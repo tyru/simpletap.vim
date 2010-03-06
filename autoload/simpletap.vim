@@ -21,7 +21,6 @@ set cpo&vim
 
 " TODO
 " - Add command macros.
-" - Add global vars to define echohl
 " - functions
 "   - done_testing()
 "   - plan()
@@ -497,7 +496,7 @@ call s:add_method('stdout_unlike')
 
 
 func! simpletap#diag(msg) "{{{
-    echohl Comment
+    execute 'echohl' g:simpletap_diag_echohl
     echomsg '#' a:msg
     echohl None
 endfunc "}}}
