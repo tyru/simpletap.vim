@@ -143,6 +143,8 @@ func! s:initialize_once() "{{{
     call s:def('failed_stdout_is', 'got: %s, expected: %s')
     call s:def('passed_stdout_like', 'ok')
     call s:def('failed_stdout_like', 'got: %s, expected like: %s')
+    call s:def('passed_stdout_unlike', 'ok')
+    call s:def('failed_stdout_unlike', 'got: %s, expected like not: %s')
     call s:def('silent', 1)
     call s:def('test_dir', '.')
 
@@ -264,6 +266,19 @@ func! simpletap#stdout_like(Code, regex, ...) "{{{
         call s:passed(testname, 'stdout_like')
     else
         call s:failed(testname, 'stdout_like', output, a:regex)
+    endif
+
+    let s:current_test_num += 1
+endfunc "}}}
+
+func! simpletap#stdout_unlike(Code, regex, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    let output = s:get_output(a:Code)
+    if !s:like(output, a:regex)
+        call s:passed(testname, 'stdout_unlike')
+    else
+        call s:failed(testname, 'stdout_unlike', output, a:regex)
     endif
 
     let s:current_test_num += 1
