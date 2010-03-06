@@ -256,6 +256,7 @@ endfunc "}}}
 
 func! s:begin_test(file) "{{{
     let s:current_test_num = 1
+    let s:dont_change_current_num = 0
     let s:done_testing = 0
     let s:test_result = []
 
