@@ -121,6 +121,7 @@ func! s:initialize_once() "{{{
     call s:def('echohl_begin', 'None')
     call s:def('echohl_done', 'Underlined')
     call s:def('recursive', 0)
+    call s:def('show_only_failed', 0)
 
     delfunc s:varname
     delfunc s:def
@@ -287,6 +288,18 @@ func! s:end_test(file) "{{{
     endif
 endfunc "}}}
 
+func! s:source(file, silent) "{{{
+    if a:silent
+        silent call s:begin_test(a:file)
+        silent execute 'source' a:file
+        silent call s:end_test(a:file)
+    else
+        call s:begin_test(a:file)
+        execute 'source' a:file
+        call s:end_test(a:file)
+    endif
+endfunc "}}}
+
 " }}}
 
 
@@ -357,9 +370,21 @@ func! simpletap#run(...) "{{{
     let tested = 0
     call s:begin_test_once()
     for t in s:glob(pat)
-        call s:begin_test(t)
-        execute 'source' t
-        call s:end_test(t)
+        if g:simpletap#show_only_failed
+            redir => output
+                call s:source(t, 1)
+            redir END
+
+            " Show messages only when test(s) failed.
+            let failed_tests = filter(copy(s:test_result), 'v:val ==# s:FAIL')
+            if !empty(failed_tests)
+                for line in split(output, '\n')
+                    echomsg line
+                endfor
+            endif
+        else
+            call s:source(t, 0)
+        endif
 
         let tested = 1
     endfor
