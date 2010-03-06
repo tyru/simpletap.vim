@@ -27,24 +27,7 @@ set cpo&vim
 
 
 " Variables {{{
-
-let simpletap#passed_ok = 'ok'
-let simpletap#failed_ok = 'NOT ok'
-let simpletap#passed_is = 'ok'
-let simpletap#failed_is = 'got: %s, expected: %s'
-let simpletap#passed_like = 'ok'
-let simpletap#failed_like = 'got: %s, expected like: %s'
-let simpletap#passed_unlike = 'ok'
-let simpletap#failed_unlike = 'got: %s, expected like not: %s'
-let simpletap#passed_stdout_is = 'ok'
-let simpletap#failed_stdout_is = 'got: %s, expected: %s'
-let simpletap#passed_stdout_like = 'ok'
-let simpletap#failed_stdout_like = 'got: %s, expected like: %s'
-let simpletap#silent = 1
-let simpletap#test_dir = '.'
-
 let s:current_test_num = 1
-
 " }}}
 
 " Functions {{{
@@ -136,6 +119,34 @@ func! s:get_output(Code) "{{{
     finally
         redir END
     endtry
+endfunc "}}}
+
+func! s:initialize_once() "{{{
+    call simpletap#load()
+
+    func! s:def(varname, default) "{{{
+        let v = 'g:simpletap#' . a:varname
+        if !exists(v)
+            let {v} = a:default
+        endif
+    endfunc "}}}
+
+    call s:def('passed_ok', 'ok')
+    call s:def('failed_ok', 'NOT ok')
+    call s:def('passed_is', 'ok')
+    call s:def('failed_is', 'got: %s, expected: %s')
+    call s:def('passed_like', 'ok')
+    call s:def('failed_like', 'got: %s, expected like: %s')
+    call s:def('passed_unlike', 'ok')
+    call s:def('failed_unlike', 'got: %s, expected like not: %s')
+    call s:def('passed_stdout_is', 'ok')
+    call s:def('failed_stdout_is', 'got: %s, expected: %s')
+    call s:def('passed_stdout_like', 'ok')
+    call s:def('failed_stdout_like', 'got: %s, expected like: %s')
+    call s:def('silent', 1)
+    call s:def('test_dir', '.')
+
+    delfunc s:def
 endfunc "}}}
 
 
@@ -283,6 +294,7 @@ command! TestEnd
 \   call s:cmd_end_test()
 " }}}
 
+call s:initialize_once()
 
 " Restore 'cpoptions' {{{
 let &cpo = s:save_cpo
