@@ -25,9 +25,6 @@ endif
 if !exists('g:simpletap_begin_echohl')
     let g:simpletap_begin_echohl = 'None'
 endif
-if !exists('g:simpletap_failed_echohl')
-    let g:simpletap_failed_echohl = 'WarningMsg'
-endif
 " }}}
 
 

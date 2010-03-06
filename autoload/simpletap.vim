@@ -274,9 +274,7 @@ func! s:end_test(file) "{{{
     if !s:done_testing
         call s:warnf("!!! test '%s' has not done properly !!!", a:file)
     elseif !empty(failed_tests)
-        execute 'echohl' g:simpletap_failed_echohl
-        echomsg printf('failed %d test(s).', len(failed_tests))
-        echohl None
+        call s:warnf('failed %d test(s).', len(failed_tests))
     else
         execute 'echohl' g:simpletap_done_echohl
         echomsg 'Done.'
