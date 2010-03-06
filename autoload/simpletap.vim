@@ -156,11 +156,11 @@ func! simpletap#exists_func(Fn, ...) "{{{
 endfunc "}}}
 
 
-func! s:begin_test() "{{{
+func! s:cmd_begin_test() "{{{
     let s:current_test_num = 1
 endfunc "}}}
 
-func! s:end_test() "{{{
+func! s:cmd_end_test() "{{{
     let s:current_test_num = 1
     echomsg 'Done.'
 endfunc "}}}
@@ -168,10 +168,10 @@ endfunc "}}}
 
 " Commands {{{
 command! TestBegin
-\   call s:begin_test()
+\   call s:cmd_begin_test()
 
 command! TestEnd
-\   call s:end_test()
+\   call s:cmd_end_test()
 " }}}
 
 
