@@ -280,9 +280,6 @@ func! s:end_test(file) "{{{
         echomsg 'Done.'
         echohl None
     endif
-
-    let s:current_test_num = 1
-    let s:done_testing = 0
 endfunc "}}}
 
 " }}}
