@@ -257,6 +257,7 @@ endfunc "}}}
 
 func! s:begin_test_once() "{{{
     command!
+    \   -bar
     \   Done
     \   let s:done_testing = 1
 endfunc "}}}
