@@ -256,8 +256,77 @@ func! s:step_num() "{{{
 endfunc "}}}
 
 func! s:begin_test_once() "{{{
+    " TODO Don't do it yourself
     command!
-    \   -bar
+    \   -nargs=*
+    \   OK
+    \   call simpletap#ok(<args>)
+    command!
+    \   -nargs=*
+    \   Ok
+    \   call simpletap#ok(<args>)
+    command!
+    \   -nargs=*
+    \   Is
+    \   call simpletap#is(<args>)
+    command!
+    \   -nargs=*
+    \   Isnt
+    \   call simpletap#isnt(<args>)
+    command!
+    \   -nargs=*
+    \   IsDeeply
+    \   call simpletap#is_deeply(<args>)
+    command!
+    \   -nargs=*
+    \   Like
+    \   call simpletap#like(<args>)
+    command!
+    \   -nargs=*
+    \   Unlike
+    \   call simpletap#unlike(<args>)
+    command!
+    \   -nargs=*
+    \   ThrowsOK
+    \   call simpletap#throws_ok(<args>)
+    command!
+    \   -nargs=*
+    \   ThrowsOk
+    \   call simpletap#throws_ok(<args>)
+    command!
+    \   -nargs=*
+    \   ExistsFunc
+    \   call simpletap#exists_func(<args>)
+    command!
+    \   -nargs=*
+    \   StdoutIs
+    \   call simpletap#stdout_is(<args>)
+    command!
+    \   -nargs=*
+    \   StdoutIsnt
+    \   call simpletap#stdout_isnt(<args>)
+    command!
+    \   -nargs=*
+    \   StdoutLike
+    \   call simpletap#stdout_like(<args>)
+    command!
+    \   -nargs=*
+    \   StdoutUnlike
+    \   call simpletap#stdout_unlike(<args>)
+    command!
+    \   -nargs=*
+    \   Diag
+    \   call simpletap#diag(<args>)
+    command!
+    \   -nargs=*
+    \   Pass
+    \   call simpletap#pass(<args>)
+    command!
+    \   -nargs=*
+    \   Fail
+    \   call simpletap#fail(<args>)
+    command!
+    \   -nargs=* -bar
     \   Done
     \   let s:done_testing = 1
 endfunc "}}}
