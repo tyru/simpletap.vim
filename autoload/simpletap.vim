@@ -42,10 +42,69 @@ set cpo&vim
 
 
 " Variables {{{
-let s:current_test_num = 1
-let s:dont_change_current_num = 0
-let s:done_testing = 0
-let s:test_result = []
+" s:test_stat {{{
+let s:test_stat = {
+\   'vars': {
+\       'current_test_num': 1,
+\       'done_testing': 0,
+\       'test_result': [],
+\   },
+\
+\   'is_locked': 0,
+\}
+
+func! s:test_vars_new() "{{{
+    return deepcopy(s:test_stat)
+endfunc "}}}
+
+func! s:test_stat.initialize() dict "{{{
+    for [key, val] in items(s:test_stat.vars)
+        call self.set(key, val)
+        unlet val
+    endfor
+endfunc "}}}
+
+func! s:test_stat.get(varname) dict "{{{
+    call s:assert(has_key(self.vars, a:varname))
+
+    return copy(self.vars[a:varname])
+endfunc "}}}
+
+func! s:test_stat.set(varname, value) dict "{{{
+    call s:assert(has_key(self.vars, a:varname))
+    if self.is_locked | return | endif
+
+    let self.vars[a:varname] = a:value
+endfunc "}}}
+
+func! s:test_stat.increment(varname) dict "{{{
+    if self.is_locked | return | endif
+
+    let val = self.get(a:varname)
+    call s:assert(type(val) == type(0))
+    call self.set(a:varname, val + 1)
+endfunc "}}}
+
+func! s:test_stat.add(varname, value) dict "{{{
+    if self.is_locked | return | endif
+
+    let list = self.get(a:varname)
+    call s:assert(type(list) == type([]))
+    call self.set(a:varname, add(list, a:value))
+endfunc "}}}
+
+func! s:test_stat.lock() dict "{{{
+    let self.is_locked = 1
+endfunc "}}}
+
+func! s:test_stat.unlock() dict "{{{
+    let self.is_locked = 0
+endfunc "}}}
+
+lockvar s:test_stat
+" }}}
+
+let s:stat = s:test_vars_new()
 
 let s:PASS = 1
 lockvar s:PASS
@@ -181,13 +240,13 @@ endfunc "}}}
 func! s:passed(testname, funcname) "{{{
     echomsg printf(
     \   '%d. %s ... %s',
-    \   s:current_test_num,
+    \   s:stat.get('current_test_num'),
     \   a:testname,
     \   g:simpletap#pass_fmt[a:funcname]
     \)
 
-    call s:assert(s:current_test_num == len(s:test_result) + 1)
-    call add(s:test_result, s:PASS)
+    call s:assert(s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1)
+    call s:stat.add('test_result', s:PASS)
 
     call s:step_num()
 endfunc "}}}
@@ -197,7 +256,7 @@ func! s:failed(testname, funcname, ...) "{{{
         call s:warn(
         \   printf(
         \      '%d. %s ... %s',
-        \      s:current_test_num,
+        \      s:stat.get('current_test_num'),
         \      a:testname,
         \      g:simpletap#fail_fmt[a:funcname]
         \   )
@@ -208,7 +267,7 @@ func! s:failed(testname, funcname, ...) "{{{
         call s:warn(
         \   printf(
         \      '%d. %s ... %s',
-        \      s:current_test_num,
+        \      s:stat.get('current_test_num'),
         \      a:testname,
         \      printf(
         \          g:simpletap#fail_fmt[a:funcname],
@@ -218,8 +277,8 @@ func! s:failed(testname, funcname, ...) "{{{
         \)
     endif
 
-    call s:assert(s:current_test_num == len(s:test_result) + 1)
-    call add(s:test_result, s:FAIL)
+    call s:assert(s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1)
+    call s:stat.add('test_result', s:FAIL)
 
     call s:step_num()
 endfunc "}}}
@@ -229,7 +288,7 @@ func! s:error(msg) "{{{
 endfunc "}}}
 
 func! s:get_output(Code) "{{{
-    let s:dont_change_current_num = 1
+    call s:stat.lock()
     redir => output
 
     try
@@ -249,28 +308,92 @@ func! s:get_output(Code) "{{{
         return substitute(output, '^\n', '', '')
     finally
         redir END
-        let s:dont_change_current_num = 0
+        call s:stat.unlock()
     endtry
 endfunc "}}}
 
 func! s:step_num() "{{{
-    if !s:dont_change_current_num
-        let s:current_test_num += 1
-    endif
+    call s:stat.increment('current_test_num')
 endfunc "}}}
 
 func! s:begin_test_once() "{{{
+    " TODO Don't do it yourself
     command!
-    \   -bar
+    \   -nargs=*
+    \   OK
+    \   call simpletap#ok(<args>)
+    command!
+    \   -nargs=*
+    \   Ok
+    \   call simpletap#ok(<args>)
+    command!
+    \   -nargs=*
+    \   Is
+    \   call simpletap#is(<args>)
+    command!
+    \   -nargs=*
+    \   Isnt
+    \   call simpletap#isnt(<args>)
+    command!
+    \   -nargs=*
+    \   IsDeeply
+    \   call simpletap#is_deeply(<args>)
+    command!
+    \   -nargs=*
+    \   Like
+    \   call simpletap#like(<args>)
+    command!
+    \   -nargs=*
+    \   Unlike
+    \   call simpletap#unlike(<args>)
+    command!
+    \   -nargs=*
+    \   ThrowsOK
+    \   call simpletap#throws_ok(<args>)
+    command!
+    \   -nargs=*
+    \   ThrowsOk
+    \   call simpletap#throws_ok(<args>)
+    command!
+    \   -nargs=*
+    \   ExistsFunc
+    \   call simpletap#exists_func(<args>)
+    command!
+    \   -nargs=*
+    \   StdoutIs
+    \   call simpletap#stdout_is(<args>)
+    command!
+    \   -nargs=*
+    \   StdoutIsnt
+    \   call simpletap#stdout_isnt(<args>)
+    command!
+    \   -nargs=*
+    \   StdoutLike
+    \   call simpletap#stdout_like(<args>)
+    command!
+    \   -nargs=*
+    \   StdoutUnlike
+    \   call simpletap#stdout_unlike(<args>)
+    command!
+    \   -nargs=*
+    \   Diag
+    \   call simpletap#diag(<args>)
+    command!
+    \   -nargs=*
+    \   Pass
+    \   call simpletap#pass(<args>)
+    command!
+    \   -nargs=*
+    \   Fail
+    \   call simpletap#fail(<args>)
+    command!
+    \   -nargs=* -bar
     \   Done
-    \   let s:done_testing = 1
+    \   call s:stat.set('done_testing', 1)
 endfunc "}}}
 
 func! s:begin_test(file) "{{{
-    let s:current_test_num = 1
-    let s:dont_change_current_num = 0
-    let s:done_testing = 0
-    let s:test_result = []
+    call s:stat.initialize()
 
     execute 'echohl' g:simpletap#echohl_begin
     echomsg 'Begin' '...' a:file
@@ -282,8 +405,8 @@ func! s:end_test_once() "{{{
 endfunc "}}}
 
 func! s:end_test(file) "{{{
-    let failed_tests = filter(copy(s:test_result), 'v:val ==# s:FAIL')
-    if !s:done_testing
+    let failed_tests = filter(copy(s:stat.get('test_result')), 'v:val ==# s:FAIL')
+    if !s:stat.get('done_testing')
         call s:warnf("!!! test '%s' has not done properly !!!", a:file)
     elseif !empty(failed_tests)
         call s:warnf('failed %d test(s).', len(failed_tests))
@@ -384,7 +507,7 @@ func! simpletap#run(...) "{{{
             redir END
 
             " Show messages only when test(s) failed.
-            let failed = !empty(filter(copy(s:test_result), 'v:val ==# s:FAIL'))
+            let failed = !empty(filter(copy(s:stat.get('test_result')), 'v:val ==# s:FAIL'))
             if failed
                 let lines = split(output, '\n')
                 let lastline = remove(lines, -1)
