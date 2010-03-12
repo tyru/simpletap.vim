@@ -454,8 +454,12 @@ let s:simpletap = {}    " See defintions at s:initialize_once().
 
 function! simpletap#new(...) "{{{
     let obj = deepcopy(s:simpletap)
+
     let obj.save_prop = a:0 != 0 ? a:1 : {}
     lockvar obj.save_prop
+
+    let obj.stat = deepcopy(s:stat)
+
     return obj
 endfunction "}}}
 
@@ -468,10 +472,13 @@ function! s:add_method(name) "{{{
     \   'function! s:simpletap.%s(...) dict',
     \       'let saved = empty(self.save_prop) ? {} : s:get_current_global_vars()',
     \       'call s:set_global_vars(self.save_prop)',
+    \       'let saved_stat = s:stat',
+    \       'let s:stat = self.stat',
     \       'try',
     \           'return call("simpletap#%s", a:000)',
     \       'finally',
     \           'call s:set_global_vars(saved)',
+    \           'let s:stat = saved_stat',
     \       'endtry',
     \   'endfunction',
     \]
