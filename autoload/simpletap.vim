@@ -188,6 +188,8 @@ func! s:passed(testname, funcname) "{{{
 
     call s:assert(s:current_test_num == len(s:test_result) + 1)
     call add(s:test_result, s:PASS)
+
+    call s:step_num()
 endfunc "}}}
 
 func! s:failed(testname, funcname, ...) "{{{
@@ -218,6 +220,8 @@ func! s:failed(testname, funcname, ...) "{{{
 
     call s:assert(s:current_test_num == len(s:test_result) + 1)
     call add(s:test_result, s:FAIL)
+
+    call s:step_num()
 endfunc "}}}
 
 func! s:error(msg) "{{{
@@ -488,8 +492,6 @@ func! simpletap#ok(cond, ...) "{{{
     else
         call s:failed(testname, 'ok')
     endif
-
-    call s:step_num()
 endfunc "}}}
 call s:add_method('ok')
 
@@ -502,8 +504,6 @@ func! simpletap#cmp_ok(got, op, expected, ...) "{{{
     else
         call s:failed(testname, 'cmp_ok', a:got, a:expected)
     endif
-
-    call s:step_num()
 endfunc "}}}
 call s:add_method('cmp_ok')
 
@@ -516,8 +516,6 @@ func! simpletap#is(got, expected, ...) "{{{
     else
         call s:failed(testname, 'is', a:got, a:expected)
     endif
-
-    call s:step_num()
 endfunc "}}}
 call s:add_method('is')
 
@@ -529,8 +527,6 @@ func! simpletap#isnt(got, expected, ...) "{{{
     else
         call s:failed(testname, 'is', a:got, a:expected)
     endif
-
-    call s:step_num()
 endfunc "}}}
 call s:add_method('isnt')
 
@@ -543,8 +539,6 @@ func! simpletap#is_deeply(got, expected, ...) "{{{
     else
         call s:failed(testname, 'is_deeply', a:got, a:expected)
     endif
-
-    call s:step_num()
 endfunc "}}}
 call s:add_method('is_deeply')
 
@@ -557,8 +551,6 @@ func! simpletap#like(got, regex, ...) "{{{
     else
         call s:failed(testname, 'like', a:got, a:regex)
     endif
-
-    call s:step_num()
 endfunc "}}}
 call s:add_method('like')
 
@@ -570,8 +562,6 @@ func! simpletap#unlike(got, regex, ...) "{{{
     else
         call s:failed(testname, 'unlike', a:got, a:regex)
     endif
-
-    call s:step_num()
 endfunc "}}}
 call s:add_method('unlike')
 
@@ -627,8 +617,6 @@ func! simpletap#stdout_is(Code, expected, ...) "{{{
     else
         call s:failed(testname, 'stdout_is', output, a:expected)
     endif
-
-    call s:step_num()
 endfunc "}}}
 call s:add_method('stdout_is')
 
@@ -641,8 +629,6 @@ func! simpletap#stdout_isnt(Code, expected, ...) "{{{
     else
         call s:failed(testname, 'stdout_isnt', output, a:expected)
     endif
-
-    call s:step_num()
 endfunc "}}}
 call s:add_method('stdout_isnt')
 
@@ -655,8 +641,6 @@ func! simpletap#stdout_like(Code, regex, ...) "{{{
     else
         call s:failed(testname, 'stdout_like', output, a:regex)
     endif
-
-    call s:step_num()
 endfunc "}}}
 call s:add_method('stdout_like')
 
@@ -669,8 +653,6 @@ func! simpletap#stdout_unlike(Code, regex, ...) "{{{
     else
         call s:failed(testname, 'stdout_unlike', output, a:regex)
     endif
-
-    call s:step_num()
 endfunc "}}}
 call s:add_method('stdout_unlike')
 
