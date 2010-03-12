@@ -175,7 +175,7 @@ func! s:initialize_once() "{{{
     \   },
     \)
     call s:def('silent', 1)
-    call s:def('test_dir', '.')
+    call s:def('test_dir', '%:p:h')
     call s:def('echohl_diag', 'Comment')
     call s:def('echohl_error', 'WarningMsg')
     call s:def('echohl_begin', 'None')
