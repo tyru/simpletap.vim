@@ -207,6 +207,42 @@ func! s:glob(expr) "{{{
     return split(glob(a:expr), "\n")
 endfunc "}}}
 
+func! s:error(msg) "{{{
+    return "simpletap:" . a:msg
+endfunc "}}}
+
+func! s:assert(cond) "{{{
+    if !a:cond
+        throw s:error("assertion failure")
+    endif
+endfunc "}}}
+
+func! s:get_output(Code) "{{{
+    call s:stat.lock()
+    redir => output
+
+    try
+        if type(a:Code) == type(function('tr'))
+            let ex = 'call a:Code()'
+        elseif type(a:Code) == type("")
+            let ex = 'execute a:Code'
+        else
+            throw s:error("type error")
+        endif
+        if g:simpletap#silent
+            silent execute ex
+        else
+            execute ex
+        endif
+        redir END
+        return substitute(output, '^\n', '', '')
+    finally
+        redir END
+        call s:stat.unlock()
+    endtry
+endfunc "}}}
+
+
 func! s:equal(l, r) "{{{
     return type(a:l) == type(a:r)
     \   && type(a:l) != type({})
@@ -231,11 +267,6 @@ func! s:cmp(l, op, r) "{{{
     return eval(printf('a:l %s a:r', a:op))
 endfunc "}}}
 
-func! s:assert(cond) "{{{
-    if !a:cond
-        throw s:error("assertion failure")
-    endif
-endfunc "}}}
 
 func! s:passed(testname, funcname) "{{{
     echomsg printf(
@@ -287,38 +318,10 @@ func! s:failed(testname, funcname, ...) "{{{
     return 0
 endfunc "}}}
 
-func! s:error(msg) "{{{
-    return "simpletap:" . a:msg
-endfunc "}}}
-
-func! s:get_output(Code) "{{{
-    call s:stat.lock()
-    redir => output
-
-    try
-        if type(a:Code) == type(function('tr'))
-            let ex = 'call a:Code()'
-        elseif type(a:Code) == type("")
-            let ex = 'execute a:Code'
-        else
-            throw s:error("type error")
-        endif
-        if g:simpletap#silent
-            silent execute ex
-        else
-            execute ex
-        endif
-        redir END
-        return substitute(output, '^\n', '', '')
-    finally
-        redir END
-        call s:stat.unlock()
-    endtry
-endfunc "}}}
-
 func! s:step_num() "{{{
     call s:stat.increment('current_test_num')
 endfunc "}}}
+
 
 func! s:begin_test_once() "{{{
     " TODO Don't do it yourself
