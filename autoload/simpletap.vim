@@ -409,7 +409,7 @@ func! s:end_test(file) "{{{
     let failed_result = filter(copy(test_result), 'v:val ==# s:FAIL')
 
     if !s:stat.get('done_testing')
-        call s:warnf("!!! test '%s' has not done properly !!!", a:file)
+        call s:warnf("test '%s' has not done properly.", a:file)
     elseif empty(test_result)
         call s:warnf("test '%s' has done but no tests performed.", a:file)
     elseif !empty(failed_result)
