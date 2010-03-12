@@ -360,10 +360,6 @@ func! s:begin_test_once() "{{{
     \   call simpletap#throws_ok(<args>)
     command!
     \   -nargs=*
-    \   ExistsFunc
-    \   call simpletap#exists_func(<args>)
-    command!
-    \   -nargs=*
     \   StdoutIs
     \   call simpletap#stdout_is(<args>)
     command!
@@ -647,27 +643,6 @@ func! simpletap#throws_ok(Code, regex, ...) "{{{
     endtry
 endfunc "}}}
 call s:add_method('throws_ok')
-
-
-func! simpletap#exists_func(Fn, ...) "{{{
-    let args = a:0 != 0 ? a:1 : []
-
-    try
-        call call(a:Fn, args)
-        return 1
-    catch /E116:/
-        return 0
-    catch /E117:/    " Unknown function: ...
-        return 0
-    catch /E118:/
-        return 0
-    catch /E119:/    " Not enough arguments for function: ...
-        return 1
-    catch /E120:/
-        return 0
-    endtry
-endfunc "}}}
-call s:add_method('exists_func')
 
 
 func! simpletap#stdout_is(Code, expected, ...) "{{{
