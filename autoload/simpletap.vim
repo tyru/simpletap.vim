@@ -53,53 +53,53 @@ let s:test_stat = {
 \   'is_locked': 0,
 \}
 
-func! s:test_vars_new() "{{{
+function! s:test_vars_new() "{{{
     return deepcopy(s:test_stat)
-endfunc "}}}
+endfunction "}}}
 
-func! s:test_stat.initialize() dict "{{{
+function! s:test_stat.initialize() dict "{{{
     for [key, val] in items(s:test_stat.vars)
         call self.set(key, val)
         unlet val
     endfor
-endfunc "}}}
+endfunction "}}}
 
-func! s:test_stat.get(varname) dict "{{{
+function! s:test_stat.get(varname) dict "{{{
     call s:assert(has_key(self.vars, a:varname))
 
     return copy(self.vars[a:varname])
-endfunc "}}}
+endfunction "}}}
 
-func! s:test_stat.set(varname, value) dict "{{{
+function! s:test_stat.set(varname, value) dict "{{{
     call s:assert(has_key(self.vars, a:varname))
     if self.is_locked | return | endif
 
     let self.vars[a:varname] = a:value
-endfunc "}}}
+endfunction "}}}
 
-func! s:test_stat.increment(varname) dict "{{{
+function! s:test_stat.increment(varname) dict "{{{
     if self.is_locked | return | endif
 
     let val = self.get(a:varname)
     call s:assert(type(val) == type(0))
     call self.set(a:varname, val + 1)
-endfunc "}}}
+endfunction "}}}
 
-func! s:test_stat.add(varname, value) dict "{{{
+function! s:test_stat.add(varname, value) dict "{{{
     if self.is_locked | return | endif
 
     let list = self.get(a:varname)
     call s:assert(type(list) == type([]))
     call self.set(a:varname, add(list, a:value))
-endfunc "}}}
+endfunction "}}}
 
-func! s:test_stat.lock() dict "{{{
+function! s:test_stat.lock() dict "{{{
     let self.is_locked = 1
-endfunc "}}}
+endfunction "}}}
 
-func! s:test_stat.unlock() dict "{{{
+function! s:test_stat.unlock() dict "{{{
     let self.is_locked = 0
-endfunc "}}}
+endfunction "}}}
 
 lockvar s:test_stat
 " }}}
@@ -114,25 +114,25 @@ lockvar s:FAIL
 
 " Functions {{{
 
-func! simpletap#load() "{{{
+function! simpletap#load() "{{{
     runtime! plugin/simpletap.vim
-endfunc "}}}
+endfunction "}}}
 
-func! s:initialize_once() "{{{
+function! s:initialize_once() "{{{
     call simpletap#load()
 
-    func! s:varname(v) "{{{
+    function! s:varname(v) "{{{
         return 'g:simpletap#' . a:v
-    endfunc "}}}
-    func! s:def(varname, default) "{{{
+    endfunction "}}}
+    function! s:def(varname, default) "{{{
         let v = s:varname(a:varname)
         if !exists(v)
             let {v} = a:default
         endif
 
         let s:simpletap[a:varname] = deepcopy({v})
-    endfunc "}}}
-    func! s:def_hash(varname, default) "{{{
+    endfunction "}}}
+    function! s:def_hash(varname, default) "{{{
         let v = s:varname(a:varname)
         if !exists(v)
             let {v} = {}
@@ -140,7 +140,7 @@ func! s:initialize_once() "{{{
         call extend({v}, a:default, 'keep')
 
         let s:simpletap[a:varname] = deepcopy({v})
-    endfunc "}}}
+    endfunction "}}}
 
     call s:def_hash(
     \   'pass_fmt',
@@ -188,36 +188,36 @@ func! s:initialize_once() "{{{
     delfunc s:def_hash
 
     lockvar s:simpletap
-endfunc "}}}
+endfunction "}}}
 
 
 " Utilities {{{
 
-func! s:warn(...) "{{{
+function! s:warn(...) "{{{
     execute 'echohl' g:simpletap#echohl_error
     echomsg join(a:000, ' ')
     echohl None
-endfunc "}}}
+endfunction "}}}
 
-func! s:warnf(...) "{{{
+function! s:warnf(...) "{{{
     call call('s:warn', [call('printf', a:000)])
-endfunc "}}}
+endfunction "}}}
 
-func! s:glob(expr) "{{{
+function! s:glob(expr) "{{{
     return split(glob(a:expr), "\n")
-endfunc "}}}
+endfunction "}}}
 
-func! s:error(msg) "{{{
+function! s:error(msg) "{{{
     return "simpletap:" . a:msg
-endfunc "}}}
+endfunction "}}}
 
-func! s:assert(cond) "{{{
+function! s:assert(cond) "{{{
     if !a:cond
         throw s:error("assertion failure")
     endif
-endfunc "}}}
+endfunction "}}}
 
-func! s:get_output(Code) "{{{
+function! s:get_output(Code) "{{{
     call s:stat.lock()
     redir => output
 
@@ -240,35 +240,35 @@ func! s:get_output(Code) "{{{
         redir END
         call s:stat.unlock()
     endtry
-endfunc "}}}
+endfunction "}}}
 
 
-func! s:equal(l, r) "{{{
+function! s:equal(l, r) "{{{
     return type(a:l) == type(a:r)
     \   && type(a:l) != type({})
     \   && type(a:l) != type([])
     \   && type(a:r) != type({})
     \   && type(a:r) != type([])
     \   && a:l ==# a:r
-endfunc "}}}
+endfunction "}}}
 
-func! s:equal_deeply(l, r) "{{{
+function! s:equal_deeply(l, r) "{{{
     return type(a:l) == type(a:r)
     \   && a:l ==# a:r
-endfunc "}}}
+endfunction "}}}
 
-func! s:like(got, regex) "{{{
+function! s:like(got, regex) "{{{
     return type(a:got) == type("")
     \   && type(a:regex) == type("")
     \   && a:got =~# a:regex
-endfunc "}}}
+endfunction "}}}
 
-func! s:cmp(l, op, r) "{{{
+function! s:cmp(l, op, r) "{{{
     return eval(printf('a:l %s a:r', a:op))
-endfunc "}}}
+endfunction "}}}
 
 
-func! s:passed(testname, funcname) "{{{
+function! s:passed(testname, funcname) "{{{
     echomsg printf(
     \   '%d. %s ... %s',
     \   s:stat.get('current_test_num'),
@@ -282,9 +282,9 @@ func! s:passed(testname, funcname) "{{{
     call s:step_num()
 
     return 1
-endfunc "}}}
+endfunction "}}}
 
-func! s:failed(testname, funcname, ...) "{{{
+function! s:failed(testname, funcname, ...) "{{{
     if a:0 == 0
         call s:warn(
         \   printf(
@@ -316,14 +316,14 @@ func! s:failed(testname, funcname, ...) "{{{
     call s:step_num()
 
     return 0
-endfunc "}}}
+endfunction "}}}
 
-func! s:step_num() "{{{
+function! s:step_num() "{{{
     call s:stat.increment('current_test_num')
-endfunc "}}}
+endfunction "}}}
 
 
-func! s:begin_test_once() "{{{
+function! s:begin_test_once() "{{{
     " TODO Don't do it yourself
     command!
     \   -nargs=*
@@ -393,21 +393,21 @@ func! s:begin_test_once() "{{{
     \   -nargs=* -bar
     \   Done
     \   call s:stat.set('done_testing', 1)
-endfunc "}}}
+endfunction "}}}
 
-func! s:begin_test(file) "{{{
+function! s:begin_test(file) "{{{
     call s:stat.initialize()
 
     execute 'echohl' g:simpletap#echohl_begin
     echomsg 'Begin' '...' a:file
     echohl None
-endfunc "}}}
+endfunction "}}}
 
-func! s:end_test_once() "{{{
+function! s:end_test_once() "{{{
     delcommand Done
-endfunc "}}}
+endfunction "}}}
 
-func! s:end_test(file) "{{{
+function! s:end_test(file) "{{{
     let test_result = s:stat.get('test_result')
     let failed_result = filter(copy(test_result), 'v:val ==# s:FAIL')
 
@@ -422,9 +422,9 @@ func! s:end_test(file) "{{{
         echomsg 'Done.'
         echohl None
     endif
-endfunc "}}}
+endfunction "}}}
 
-func! s:source(file, silent) "{{{
+function! s:source(file, silent) "{{{
     if a:silent
         silent call s:begin_test(a:file)
         silent execute 'source' a:file
@@ -434,7 +434,7 @@ func! s:source(file, silent) "{{{
         execute 'source' a:file
         call s:end_test(a:file)
     endif
-endfunc "}}}
+endfunction "}}}
 
 " }}}
 
@@ -442,20 +442,20 @@ endfunc "}}}
 " OO interface {{{
 let s:simpletap = {}    " See defintions at s:initialize_once().
 
-func! simpletap#new(...) "{{{
+function! simpletap#new(...) "{{{
     let obj = deepcopy(s:simpletap)
     let obj.save_prop = a:0 != 0 ? a:1 : {}
     lockvar obj.save_prop
     return obj
-endfunc "}}}
+endfunction "}}}
 
-func! s:add_method(name) "{{{
+function! s:add_method(name) "{{{
     if has_key(s:simpletap, a:name)
         return
     endif
 
     let template = [
-    \   'func! s:simpletap.%s(...) dict',
+    \   'function! s:simpletap.%s(...) dict',
     \       'let saved = empty(self.save_prop) ? {} : s:get_current_global_vars()',
     \       'call s:set_global_vars(self.save_prop)',
     \       'try',
@@ -463,34 +463,34 @@ func! s:add_method(name) "{{{
     \       'finally',
     \           'call s:set_global_vars(saved)',
     \       'endtry',
-    \   'endfunc',
+    \   'endfunction',
     \]
     execute printf(join(template, "\n"), a:name, a:name)
-endfunc "}}}
+endfunction "}}}
 
-func! s:get_global_varnames() "{{{
+function! s:get_global_varnames() "{{{
     return keys(filter(copy(s:simpletap), 'type(v:val) != type(function("tr"))'))
-endfunc "}}}
+endfunction "}}}
 
-func! s:get_current_global_vars() "{{{
+function! s:get_current_global_vars() "{{{
     let ret = {}
     for var in s:get_global_varnames()
         let ret[var] = deepcopy(g:simpletap#{var})
     endfor
     return ret
-endfunc "}}}
+endfunction "}}}
 
-func! s:set_global_vars(prop) "{{{
+function! s:set_global_vars(prop) "{{{
     for var in keys(a:prop)
         let g:simpletap#{var} = deepcopy(a:prop[var])
     endfor
-endfunc "}}}
+endfunction "}}}
 
 " }}}
 
 " Autoload {{{
 
-func! simpletap#run(...) "{{{
+function! simpletap#run(...) "{{{
     let dir = a:0 != 0 ? a:1 : g:simpletap#test_dir
     let dir = expand(dir)
     if !isdirectory(dir)
@@ -541,11 +541,11 @@ func! simpletap#run(...) "{{{
     if !tested
         call s:warn('no tests to run.')
     endif
-endfunc "}}}
+endfunction "}}}
 call s:add_method('run')
 
 
-func! simpletap#ok(cond, ...) "{{{
+function! simpletap#ok(cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if a:cond
@@ -553,11 +553,11 @@ func! simpletap#ok(cond, ...) "{{{
     else
         return s:failed(testname, 'ok')
     endif
-endfunc "}}}
+endfunction "}}}
 call s:add_method('ok')
 
 
-func! simpletap#cmp_ok(got, op, expected, ...) "{{{
+function! simpletap#cmp_ok(got, op, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:cmp(a:got, a:op, a:expected)
@@ -565,11 +565,11 @@ func! simpletap#cmp_ok(got, op, expected, ...) "{{{
     else
         return s:failed(testname, 'cmp_ok', a:got, a:expected)
     endif
-endfunc "}}}
+endfunction "}}}
 call s:add_method('cmp_ok')
 
 
-func! simpletap#is(got, expected, ...) "{{{
+function! simpletap#is(got, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:equal(a:got, a:expected)
@@ -577,10 +577,10 @@ func! simpletap#is(got, expected, ...) "{{{
     else
         return s:failed(testname, 'is', a:got, a:expected)
     endif
-endfunc "}}}
+endfunction "}}}
 call s:add_method('is')
 
-func! simpletap#isnt(got, expected, ...) "{{{
+function! simpletap#isnt(got, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if !s:equal(a:got, a:expected)
@@ -588,11 +588,11 @@ func! simpletap#isnt(got, expected, ...) "{{{
     else
         return s:failed(testname, 'is', a:got, a:expected)
     endif
-endfunc "}}}
+endfunction "}}}
 call s:add_method('isnt')
 
 
-func! simpletap#is_deeply(got, expected, ...) "{{{
+function! simpletap#is_deeply(got, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:equal_deeply(a:got, a:expected)
@@ -600,11 +600,11 @@ func! simpletap#is_deeply(got, expected, ...) "{{{
     else
         return s:failed(testname, 'is_deeply', a:got, a:expected)
     endif
-endfunc "}}}
+endfunction "}}}
 call s:add_method('is_deeply')
 
 
-func! simpletap#like(got, regex, ...) "{{{
+function! simpletap#like(got, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:like(a:got, a:regex)
@@ -612,10 +612,10 @@ func! simpletap#like(got, regex, ...) "{{{
     else
         return s:failed(testname, 'like', a:got, a:regex)
     endif
-endfunc "}}}
+endfunction "}}}
 call s:add_method('like')
 
-func! simpletap#unlike(got, regex, ...) "{{{
+function! simpletap#unlike(got, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if !s:like(a:got, a:regex)
@@ -623,11 +623,11 @@ func! simpletap#unlike(got, regex, ...) "{{{
     else
         return s:failed(testname, 'unlike', a:got, a:regex)
     endif
-endfunc "}}}
+endfunction "}}}
 call s:add_method('unlike')
 
 
-func! simpletap#throws_ok(Code, regex, ...) "{{{
+function! simpletap#throws_ok(Code, regex, ...) "{{{
     try
         if type(a:Code) == type(function("tr"))
             call a:Code()
@@ -644,11 +644,11 @@ func! simpletap#throws_ok(Code, regex, ...) "{{{
             throw substitute(v:exception, '^Vim'.'\C', '', '')
         endif
     endtry
-endfunc "}}}
+endfunction "}}}
 call s:add_method('throws_ok')
 
 
-func! simpletap#stdout_is(Code, expected, ...) "{{{
+function! simpletap#stdout_is(Code, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     let output = s:get_output(a:Code)
@@ -657,10 +657,10 @@ func! simpletap#stdout_is(Code, expected, ...) "{{{
     else
         return s:failed(testname, 'stdout_is', output, a:expected)
     endif
-endfunc "}}}
+endfunction "}}}
 call s:add_method('stdout_is')
 
-func! simpletap#stdout_isnt(Code, expected, ...) "{{{
+function! simpletap#stdout_isnt(Code, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     let output = s:get_output(a:Code)
@@ -669,10 +669,10 @@ func! simpletap#stdout_isnt(Code, expected, ...) "{{{
     else
         return s:failed(testname, 'stdout_isnt', output, a:expected)
     endif
-endfunc "}}}
+endfunction "}}}
 call s:add_method('stdout_isnt')
 
-func! simpletap#stdout_like(Code, regex, ...) "{{{
+function! simpletap#stdout_like(Code, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     let output = s:get_output(a:Code)
@@ -681,10 +681,10 @@ func! simpletap#stdout_like(Code, regex, ...) "{{{
     else
         return s:failed(testname, 'stdout_like', output, a:regex)
     endif
-endfunc "}}}
+endfunction "}}}
 call s:add_method('stdout_like')
 
-func! simpletap#stdout_unlike(Code, regex, ...) "{{{
+function! simpletap#stdout_unlike(Code, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     let output = s:get_output(a:Code)
@@ -693,26 +693,26 @@ func! simpletap#stdout_unlike(Code, regex, ...) "{{{
     else
         return s:failed(testname, 'stdout_unlike', output, a:regex)
     endif
-endfunc "}}}
+endfunction "}}}
 call s:add_method('stdout_unlike')
 
 
-func! simpletap#diag(msg) "{{{
+function! simpletap#diag(msg) "{{{
     execute 'echohl' g:simpletap#echohl_diag
     echomsg '#' a:msg
     echohl None
-endfunc "}}}
+endfunction "}}}
 call s:add_method('diag')
 
 
-func! simpletap#pass() "{{{
+function! simpletap#pass() "{{{
     return simpletap#ok(1)
-endfunc "}}}
+endfunction "}}}
 call s:add_method('pass')
 
-func! simpletap#fail() "{{{
+function! simpletap#fail() "{{{
     return simpletap#ok(0)
-endfunc "}}}
+endfunction "}}}
 call s:add_method('fail')
 
 " }}}
