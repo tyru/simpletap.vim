@@ -249,6 +249,8 @@ func! s:passed(testname, funcname) "{{{
     call s:stat.add('test_result', s:PASS)
 
     call s:step_num()
+
+    return 1
 endfunc "}}}
 
 func! s:failed(testname, funcname, ...) "{{{
@@ -281,6 +283,8 @@ func! s:failed(testname, funcname, ...) "{{{
     call s:stat.add('test_result', s:FAIL)
 
     call s:step_num()
+
+    return 0
 endfunc "}}}
 
 func! s:error(msg) "{{{
@@ -546,9 +550,9 @@ func! simpletap#ok(cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if a:cond
-        call s:passed(testname, 'ok')
+        return s:passed(testname, 'ok')
     else
-        call s:failed(testname, 'ok')
+        return s:failed(testname, 'ok')
     endif
 endfunc "}}}
 call s:add_method('ok')
@@ -558,9 +562,9 @@ func! simpletap#cmp_ok(got, op, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:cmp(a:got, a:op, a:expected)
-        call s:passed(testname, 'cmp_ok')
+        return s:passed(testname, 'cmp_ok')
     else
-        call s:failed(testname, 'cmp_ok', a:got, a:expected)
+        return s:failed(testname, 'cmp_ok', a:got, a:expected)
     endif
 endfunc "}}}
 call s:add_method('cmp_ok')
@@ -570,9 +574,9 @@ func! simpletap#is(got, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:equal(a:got, a:expected)
-        call s:passed(testname, 'is')
+        return s:passed(testname, 'is')
     else
-        call s:failed(testname, 'is', a:got, a:expected)
+        return s:failed(testname, 'is', a:got, a:expected)
     endif
 endfunc "}}}
 call s:add_method('is')
@@ -581,9 +585,9 @@ func! simpletap#isnt(got, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if !s:equal(a:got, a:expected)
-        call s:passed(testname, 'is')
+        return s:passed(testname, 'is')
     else
-        call s:failed(testname, 'is', a:got, a:expected)
+        return s:failed(testname, 'is', a:got, a:expected)
     endif
 endfunc "}}}
 call s:add_method('isnt')
@@ -593,9 +597,9 @@ func! simpletap#is_deeply(got, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:equal_deeply(a:got, a:expected)
-        call s:passed(testname, 'is_deeply')
+        return s:passed(testname, 'is_deeply')
     else
-        call s:failed(testname, 'is_deeply', a:got, a:expected)
+        return s:failed(testname, 'is_deeply', a:got, a:expected)
     endif
 endfunc "}}}
 call s:add_method('is_deeply')
@@ -605,9 +609,9 @@ func! simpletap#like(got, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:like(a:got, a:regex)
-        call s:passed(testname, 'like')
+        return s:passed(testname, 'like')
     else
-        call s:failed(testname, 'like', a:got, a:regex)
+        return s:failed(testname, 'like', a:got, a:regex)
     endif
 endfunc "}}}
 call s:add_method('like')
@@ -616,9 +620,9 @@ func! simpletap#unlike(got, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if !s:like(a:got, a:regex)
-        call s:passed(testname, 'unlike')
+        return s:passed(testname, 'unlike')
     else
-        call s:failed(testname, 'unlike', a:got, a:regex)
+        return s:failed(testname, 'unlike', a:got, a:regex)
     endif
 endfunc "}}}
 call s:add_method('unlike')
@@ -633,10 +637,10 @@ func! simpletap#throws_ok(Code, regex, ...) "{{{
         else
             throw s:error("type error")
         endif
-        call call('simpletap#ok', [0] + a:000)
+        return call('simpletap#ok', [0] + a:000)
     catch
         if v:exception =~# a:regex
-            call call('simpletap#ok', [1] + a:000)
+            return call('simpletap#ok', [1] + a:000)
         else
             throw substitute(v:exception, '^Vim'.'\C', '', '')
         endif
@@ -671,9 +675,9 @@ func! simpletap#stdout_is(Code, expected, ...) "{{{
 
     let output = s:get_output(a:Code)
     if s:equal(output, a:expected)
-        call s:passed(testname, 'stdout_is')
+        return s:passed(testname, 'stdout_is')
     else
-        call s:failed(testname, 'stdout_is', output, a:expected)
+        return s:failed(testname, 'stdout_is', output, a:expected)
     endif
 endfunc "}}}
 call s:add_method('stdout_is')
@@ -683,9 +687,9 @@ func! simpletap#stdout_isnt(Code, expected, ...) "{{{
 
     let output = s:get_output(a:Code)
     if !s:equal(output, a:expected)
-        call s:passed(testname, 'stdout_isnt')
+        return s:passed(testname, 'stdout_isnt')
     else
-        call s:failed(testname, 'stdout_isnt', output, a:expected)
+        return s:failed(testname, 'stdout_isnt', output, a:expected)
     endif
 endfunc "}}}
 call s:add_method('stdout_isnt')
@@ -695,9 +699,9 @@ func! simpletap#stdout_like(Code, regex, ...) "{{{
 
     let output = s:get_output(a:Code)
     if s:like(output, a:regex)
-        call s:passed(testname, 'stdout_like')
+        return s:passed(testname, 'stdout_like')
     else
-        call s:failed(testname, 'stdout_like', output, a:regex)
+        return s:failed(testname, 'stdout_like', output, a:regex)
     endif
 endfunc "}}}
 call s:add_method('stdout_like')
@@ -707,9 +711,9 @@ func! simpletap#stdout_unlike(Code, regex, ...) "{{{
 
     let output = s:get_output(a:Code)
     if !s:like(output, a:regex)
-        call s:passed(testname, 'stdout_unlike')
+        return s:passed(testname, 'stdout_unlike')
     else
-        call s:failed(testname, 'stdout_unlike', output, a:regex)
+        return s:failed(testname, 'stdout_unlike', output, a:regex)
     endif
 endfunc "}}}
 call s:add_method('stdout_unlike')
