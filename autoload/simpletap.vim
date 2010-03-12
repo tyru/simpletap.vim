@@ -389,10 +389,20 @@ function! s:begin_test_once() "{{{
     \   -nargs=*
     \   Fail
     \   call simpletap#fail(<args>)
+
     command!
     \   -nargs=* -bar
     \   Done
     \   call s:stat.set('done_testing', 1)
+
+    command!
+    \   -bar
+    \   StatLock
+    \   call s:stat.lock()
+    command!
+    \   -bar
+    \   StatUnlock
+    \   call s:stat.unlock()
 endfunction "}}}
 
 function! s:begin_test(file) "{{{
