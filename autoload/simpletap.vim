@@ -386,6 +386,16 @@ func! s:begin_test_once() "{{{
     \   -nargs=*
     \   Fail
     \   call simpletap#fail(<args>)
+
+    command!
+    \   -nargs=*
+    \   Opts
+    \   SetOpts <args>
+    command!
+    \   -nargs=*
+    \   SetOpts
+    \   call simpletap#set_opts(s:parse_opts(<q-args>))
+
     command!
     \   -nargs=* -bar
     \   Done
@@ -427,6 +437,171 @@ func! s:source(file, silent) "{{{
         execute 'source' a:file
         call s:end_test(a:file)
     endif
+endfunc "}}}
+
+" Parser functions {{{
+
+func! s:skip_spaces(s) "{{{
+    return substitute(a:s, '^\s*', '', '')
+endfunc "}}}
+
+func! s:is_number(s) "{{{
+    return a:s[0] =~# '^\d$'
+endfunc "}}}
+
+func! s:is_string(s) "{{{
+    return a:s[0] ==# '"' || a:s[0] ==# "'"
+endfunc "}}}
+
+func! s:is_dict(s) "{{{
+    return a:s[0] ==# '{'
+endfunc "}}}
+
+func! s:is_list(s) "{{{
+    return a:s[0] ==# '['
+endfunc "}}}
+
+" Assumption: a:s[0] is not whitespace.
+func! s:parse_number(s) "{{{
+    let num = '^\d\+\(\.\d\+\)\='
+    let m = matchstr(a:s, num)
+    let s = substitute(a:s, num, '', '')
+    if m == ''
+        throw s:error("parse error")
+    endif
+    return [eval(m), s]
+endfunc "}}}
+
+" Assumption: a:s[0] is not whitespace.
+func! s:parse_string(s) "{{{
+    " TODO: backslashes
+    let sep = '^\([''"]\)\([^''"]*\)\1'
+    let m = matchstr(a:s, sep)
+    let s = substitute(a:s, sep, '', '')
+    let m = substitute(m, sep, '\2', '')    " Remove outside quotes.
+    if m == ''
+        throw s:error("parse error")
+    endif
+    return [eval(m), s]
+endfunc "}}}
+
+" Assumption: a:s[0] is not whitespace.
+func! s:parse_dict_key(s) "{{{
+    if a:s[0] ==# '"' || a:s[0] == "'"
+        return s:parse_string(a:s)
+    else
+        let word = '^\w\+'
+        let m = matchstr(a:s, word)
+        let s = substitute(a:s, word, '', '')
+        if m == ''
+            throw s:error("parse error")
+        endif
+        return [m, s]
+    endif
+endfunc "}}}
+
+" Assumption: a:s[0] is not whitespace.
+func! s:parse_dict_sep(s) "{{{
+    let sep = '^\(:\|=>\)'
+    let m = matchstr(a:s, sep)
+    let s = substitute(a:s, sep, '', '')
+    if m == ''
+        throw s:error("parse error")
+    endif
+    return [m, s]
+endfunc "}}}
+
+" Assumption: a:s[0] is not whitespace.
+func! s:parse_dict(s) "{{{
+    " This function allows JSON-like format.
+
+    let s = a:s
+    let break = 'if s == "" | break | endif'
+    let error = 'if s == "" | throw s:error("parse error") | endif'
+    let ret = {}
+
+    if !s:is_dict(s)
+        throw s:error("parse error")
+    endif
+    let s = strpart(s, 1)
+
+    while 1
+        let s = s:skip_spaces(s)
+        execute break
+
+        let [key, s] = s:parse_dict_key(s)
+        let s = s:skip_spaces(s)
+        execute error
+
+        let [sep, s] = s:parse_dict_sep(s)
+        let s = s:skip_spaces(s)
+        execute error
+
+        let [value, s] = s:parse_value(s)
+        let ret[key] = value
+    endwhile
+    return [ret, s]
+endfunc "}}}
+
+" Assumption: a:s[0] is not whitespace.
+func! s:parse_list_sep(s) "{{{
+    let sep = '^,'
+    let m = matchstr(a:s, sep)
+    let s = substitute(a:s, sep, '', '')
+    if m == ''
+        throw s:error("parse error")
+    endif
+    return [m, s]
+endfunc "}}}
+
+" Assumption: a:s[0] is not whitespace.
+func! s:parse_list(s) "{{{
+    let s = a:s
+    let break = 'if s == "" | break | endif'
+    let error = 'if s == "" | throw s:error("parse error") | endif'
+    let ret = []
+
+    if !s:is_list(s)
+        throw s:error("parse error")
+    endif
+    let s = strpart(s, 1)
+
+    while 1
+        let s = s:skip_spaces(s)
+        execute break
+
+        let [value, s] = s:parse_value(s)
+        call add(ret, value)
+
+        let [sep, s] = s:parse_list_sep(s)
+    endwhile
+
+    return [ret, s]
+endfunc "}}}
+
+" Assumption: a:s[0] is not whitespace.
+func! s:parse_value(s) "{{{
+    let s = a:s
+
+    if s:is_dict(s)
+        return s:parse_dict(s)
+    elseif s:is_list(s)
+        return s:parse_list(s)
+    else
+        if s:is_string(s)
+            return s:parse_string(s)
+        elseif s:is_number(s)
+            return s:parse_number(s)
+        else
+            throw s:error("parse error")
+        endif
+    endif
+endfunc "}}}
+
+" }}}
+
+func! s:parse_opts(qarg) "{{{
+    return s:parse_dict('{' . a:qarg . '}')[0]
 endfunc "}}}
 
 " }}}
@@ -536,6 +711,15 @@ func! simpletap#run(...) "{{{
     endif
 endfunc "}}}
 call s:add_method('run')
+
+func! simpletap#set_opts(opts) "{{{
+    " opts is Dictionary.
+    for [k, v] in items(a:opts)
+        " TODO Check existence?
+        let g:simpletap#{k} = v
+    endfor
+endfunc "}}}
+call s:add_method('set_opts')
 
 
 func! simpletap#ok(cond, ...) "{{{
