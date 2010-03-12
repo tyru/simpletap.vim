@@ -405,11 +405,15 @@ func! s:end_test_once() "{{{
 endfunc "}}}
 
 func! s:end_test(file) "{{{
-    let failed_tests = filter(copy(s:stat.get('test_result')), 'v:val ==# s:FAIL')
+    let test_result = s:stat.get('test_result')
+    let failed_result = filter(copy(test_result), 'v:val ==# s:FAIL')
+
     if !s:stat.get('done_testing')
         call s:warnf("!!! test '%s' has not done properly !!!", a:file)
-    elseif !empty(failed_tests)
-        call s:warnf('failed %d test(s).', len(failed_tests))
+    elseif empty(test_result)
+        call s:warnf("test '%s' has done but no tests performed.", a:file)
+    elseif !empty(failed_result)
+        call s:warnf('failed %d test(s).', len(failed_result))
     else
         execute 'echohl' g:simpletap#echohl_done
         echomsg 'Done.'
