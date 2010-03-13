@@ -416,7 +416,7 @@ function! s:begin_test(file) "{{{
 endfunction "}}}
 
 function! s:end_test_once() "{{{
-    delcommand Done
+    delcommand OK Ok Is Isnt IsDeeply Like Unlike ThrowsOK ThrowsOk StdoutIs StdoutIsnt StdoutLike StdoutUnlike Diag Pass Fail Done StatLock StatUnlock
 endfunction "}}}
 
 function! s:end_test(file) "{{{
