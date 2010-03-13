@@ -600,6 +600,7 @@ function! simpletap#cmp_ok(got, op, expected, ...) "{{{
     if s:cmp(a:got, a:op, a:expected)
         return s:passed(testname, 'cmp_ok')
     else
+        " TODO Output a:op.
         return s:failed(testname, 'cmp_ok', a:got, a:expected)
     endif
 endfunction "}}}
