@@ -32,11 +32,15 @@ func! s:get_args(method) "{{{
 
     if has_key(args, a:method)
         return args[a:method]
-    elseif !empty(filter(skip, 'v:val ==# a:method'))
+    elseif s:list_has(skip, a:method)
         throw 'skip'
     else
         throw 'no args'
     endif
+endfunc "}}}
+
+func! s:list_has(list, elem) "{{{
+    return !empty(filter(copy(a:list), 'v:val ==# a:elem'))
 endfunc "}}}
 
 func! s:run() "{{{
@@ -56,13 +60,23 @@ func! s:run() "{{{
             continue
         endtry
 
-        " TODO Test output.
-        " FIXME failed 2 tests but are not visible.
-        let got = simpletap#util#locked_call_silent(o[method], args, o)
-        let expected = simpletap#util#locked_call_silent('simpletap#' . method, args)
+        " TODO Stackable :redir
+        if s:list_has(['stdout_is', 'stdout_isnt', 'stdout_like', 'stdout_unlike'], method)
+            let got = simpletap#util#locked_call_silent(o[method], args, o)
+            let expected = simpletap#util#locked_call_silent('simpletap#' . method, args)
 
-        Is got, expected, method
-        " Is got_output, expected_output, method
+            Is got, expected, method
+        else
+            redir => got_output
+                let got = simpletap#util#locked_call_silent(o[method], args, o)
+            redir END
+            redir => expected_output
+                let expected = simpletap#util#locked_call_silent('simpletap#' . method, args)
+            redir END
+
+            Is got, expected, method
+            Is got_output, expected_output, method
+        endif
     endfor
 endfunc "}}}
 
