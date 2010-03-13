@@ -219,6 +219,8 @@ endfunction "}}}
 
 function! s:get_output(Code) "{{{
     call s:stat.lock()
+
+    redir END
     redir => output
 
     try
