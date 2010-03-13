@@ -32,6 +32,34 @@ function! simpletap#util#really_exists_func(Fn, ...) "{{{
     endtry
 endfunction "}}}
 
+
+function! simpletap#util#locked_call(...) "{{{
+    return call('s:locked_call', a:000)
+endfunction "}}}
+
+function! simpletap#util#locked_call_silent(...) "{{{
+    silent return call('s:locked_call', a:000)
+endfunction "}}}
+
+function! s:locked_call(Fn, args, ...) "{{{
+    if a:0 == 0
+        StatLock
+        try
+            return call(a:Fn, a:args)
+        finally
+            StatUnlock
+        endtry
+    else
+        let obj = a:1
+        call obj.stat.lock()
+        try
+            return call(a:Fn, a:args, obj)
+        finally
+            call obj.stat.unlock()
+        endtry
+    endif
+endfunction "}}}
+
 " }}}
 
 " Restore 'cpoptions' {{{
