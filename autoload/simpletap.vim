@@ -622,9 +622,9 @@ function! simpletap#isnt(got, expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if !s:equal(a:got, a:expected)
-        return s:passed(testname, 'is')
+        return s:passed(testname, 'isnt')
     else
-        return s:failed(testname, 'is', a:got, a:expected)
+        return s:failed(testname, 'isnt', a:got, a:expected)
     endif
 endfunction "}}}
 call s:add_method('isnt')
