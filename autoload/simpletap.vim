@@ -714,9 +714,9 @@ endfunction "}}}
 call s:add_method('stdout_unlike')
 
 
-function! simpletap#diag(msg) "{{{
+function! simpletap#diag(...) "{{{
     execute 'echohl' g:simpletap#echohl_diag
-    echomsg '#' a:msg
+    echomsg '#' join(a:000, ' ')
     echohl None
 endfunction "}}}
 call s:add_method('diag')
