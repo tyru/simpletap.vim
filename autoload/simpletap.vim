@@ -416,7 +416,25 @@ function! s:begin_test(file) "{{{
 endfunction "}}}
 
 function! s:end_test_once() "{{{
-    delcommand OK Ok Is Isnt IsDeeply Like Unlike ThrowsOK ThrowsOk StdoutIs StdoutIsnt StdoutLike StdoutUnlike Diag Pass Fail Done StatLock StatUnlock
+    delcommand OK
+    delcommand Ok
+    delcommand Is
+    delcommand Isnt
+    delcommand IsDeeply
+    delcommand Like
+    delcommand Unlike
+    delcommand ThrowsOK
+    delcommand ThrowsOk
+    delcommand StdoutIs
+    delcommand StdoutIsnt
+    delcommand StdoutLike
+    delcommand StdoutUnlike
+    delcommand Diag
+    delcommand Pass
+    delcommand Fail
+    delcommand Done
+    delcommand StatLock
+    delcommand StatUnlock
 endfunction "}}}
 
 function! s:end_test(file) "{{{
