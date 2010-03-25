@@ -32,6 +32,9 @@ set cpo&vim
 "     - I don't know how to implement
 " - test
 " - Show more info when test(s) failed.
+" - eskk#util#get_function({funcname}, {SID})
+"   - Get Funcref from script local function.
+" - Define global variable or environment variable.
 "
 " Needless:
 " - can_ok()
