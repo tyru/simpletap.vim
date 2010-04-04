@@ -20,7 +20,7 @@ if !exists('g:simpletap_run_command_complete')
 endif
 if g:simpletap_run_command != ''
     execute
-    \   'command'
+    \   'command!'
     \   '-nargs=? -complete='.join(g:simpletap_run_command_complete, ',')
     \   g:simpletap_run_command
     \   'call simpletap#run(<f-args>)'
