@@ -121,6 +121,10 @@ function! simpletap#load() "{{{
     runtime! plugin/simpletap.vim
 endfunction "}}}
 
+function! simpletap#define_macro() "{{{
+    call s:begin_test_once()
+endfunction "}}}
+
 function! s:initialize_once() "{{{
     call simpletap#load()
 
