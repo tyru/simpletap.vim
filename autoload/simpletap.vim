@@ -163,6 +163,7 @@ function! s:initialize_once() "{{{
     \       'stdout_isnt': 'ok',
     \       'stdout_like': 'ok',
     \       'stdout_unlike': 'ok',
+    \       'throws_ok': 'ok',
     \   },
     \)
     call s:def_hash(
@@ -179,6 +180,7 @@ function! s:initialize_once() "{{{
     \       'stdout_isnt': 'got: %s, expected: %s',
     \       'stdout_like': 'got: %s, expected like: %s',
     \       'stdout_unlike': 'got: %s, expected like not: %s',
+    \       'throws_ok': 'got exception: %s, expected like: %s',
     \   },
     \)
     call s:def('silent', 1)
