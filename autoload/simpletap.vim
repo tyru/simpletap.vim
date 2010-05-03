@@ -674,23 +674,20 @@ endfunction "}}}
 call s:add_method('unlike')
 
 
-function! simpletap#throws_ok(Code, regex, ...) "{{{
+function! simpletap#throws_ok(excmd, regex, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
     try
-        if type(a:Code) == type(function("tr"))
-            call a:Code()
-        elseif type(a:Code) == type("")
-            execute a:Code
-        else
-            throw s:error("type error")
-        endif
-        return call('simpletap#ok', [0] + a:000)
+        execute a:excmd
     catch
-        if v:exception =~# a:regex
-            return call('simpletap#ok', [1] + a:000)
-        else
-            throw substitute(v:exception, '^Vim'.'\C', '', '')
-        endif
+        let ex = v:exception
     endtry
+
+    if exists('ex') && s:like(ex, a:regex)
+        return s:passed(testname, 'throws_ok')
+    else
+        return s:failed(testname, 'throws_ok', ex, a:regex)
+    endif
 endfunction "}}}
 call s:add_method('throws_ok')
 
