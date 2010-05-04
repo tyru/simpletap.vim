@@ -50,6 +50,7 @@ let s:test_stat = {
 \   'vars': {
 \       'current_test_num': 1,
 \       'done_testing': 0,
+\       'skipped': 0,
 \       'test_result': [],
 \   },
 \
@@ -189,6 +190,7 @@ function! s:initialize_once() "{{{
     call s:def('echohl_error', 'WarningMsg')
     call s:def('echohl_begin', 'None')
     call s:def('echohl_done', 'Underlined')
+    call s:def('echohl_skip', 'Underlined')
     call s:def('recursive', 0)
     call s:def('show_only_failed', 0)
     call s:def('show_exception', 1)
@@ -401,6 +403,10 @@ function! s:begin_test_once() "{{{
     \   -nargs=*
     \   Fail
     \   call simpletap#fail(<args>)
+    command!
+    \   -nargs=*
+    \   Skip
+    \   call simpletap#skip(<args>)
 
     command!
     \   -nargs=* -bar
@@ -442,6 +448,7 @@ function! s:end_test_once() "{{{
     delcommand Diag
     delcommand Pass
     delcommand Fail
+    delcommand Skip
     delcommand Done
     delcommand StatLock
     delcommand StatUnlock
@@ -451,7 +458,11 @@ function! s:end_test(file) "{{{
     let test_result = s:stat.get('test_result')
     let failed_result = filter(copy(test_result), 'v:val ==# s:FAIL')
 
-    if !s:stat.get('done_testing')
+    if s:stat.get('skipped')
+        execute 'echohl' g:simpletap#echohl_skip
+        echomsg 'Skip.'
+        echohl None
+    elseif !s:stat.get('done_testing')
         call s:warnf("test '%s' has not done properly.", a:file)
     elseif empty(test_result)
         call s:warnf("test '%s' has done but no tests performed.", a:file)
@@ -470,6 +481,9 @@ function! s:source(file, silent) "{{{
     execute silent 'call s:begin_test(a:file)'
     try
         execute silent 'execute "source" a:file'
+    catch /^simpletap - SKIP$/
+        call s:stat.set('skipped', 1)
+        throw v:exception
     finally
         execute silent 'call s:end_test(a:file)'
     endtry
@@ -574,6 +588,7 @@ function! simpletap#run(...) "{{{
             endif
 
             let tested = 1
+        catch /^simpletap - SKIP$/
         catch
             if g:simpletap#show_exception
                 call s:warn('# Exception throwed.')
@@ -765,6 +780,14 @@ function! simpletap#fail() "{{{
     return simpletap#ok(0)
 endfunction "}}}
 call s:add_method('fail')
+
+
+function! simpletap#skip(...) "{{{
+    if a:0 != 0
+        Diag a:1
+    endif
+    throw 'simpletap - SKIP'
+endfunction "}}}
 
 " }}}
 
