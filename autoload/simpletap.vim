@@ -191,6 +191,7 @@ function! s:initialize_once() "{{{
     call s:def('echohl_done', 'Underlined')
     call s:def('recursive', 0)
     call s:def('show_only_failed', 0)
+    call s:def('show_exception', 1)
 
     delfunc s:varname
     delfunc s:def
@@ -464,15 +465,14 @@ function! s:end_test(file) "{{{
 endfunction "}}}
 
 function! s:source(file, silent) "{{{
-    if a:silent
-        silent call s:begin_test(a:file)
-        silent execute 'source' a:file
-        silent call s:end_test(a:file)
-    else
-        call s:begin_test(a:file)
-        execute 'source' a:file
-        call s:end_test(a:file)
-    endif
+    let silent = a:silent ? 'silent' : ''
+
+    execute silent 'call s:begin_test(a:file)'
+    try
+        execute silent 'execute "source" a:file'
+    finally
+        execute silent 'call s:end_test(a:file)'
+    endtry
 endfunction "}}}
 
 " }}}
@@ -554,25 +554,32 @@ function! simpletap#run(...) "{{{
     call s:begin_test_once()
 
     for t in s:glob(pat)
-        if g:simpletap#show_only_failed
-            redir => output
-                call s:source(t, 1)
-            redir END
+        try
+            if g:simpletap#show_only_failed
+                redir => output
+                    call s:source(t, 1)
+                redir END
 
-            " Show messages only when test(s) failed.
-            let failed = !empty(filter(copy(s:stat.get('test_result')), 'v:val ==# s:FAIL'))
-            if failed
-                let lines = split(output, '\n')
-                let lastline = remove(lines, -1)
-                for l in lines
-                    echomsg l
-                endfor
+                " Show messages only when test(s) failed.
+                let failed = !empty(filter(copy(s:stat.get('test_result')), 'v:val ==# s:FAIL'))
+                if failed
+                    let lines = split(output, '\n')
+                    let lastline = remove(lines, -1)
+                    for l in lines
+                        echomsg l
+                    endfor
+                endif
+            else
+                call s:source(t, 0)
             endif
-        else
-            call s:source(t, 0)
-        endif
 
-        let tested = 1
+            let tested = 1
+        catch
+            if g:simpletap#show_exception
+                call s:warn('# Exception throwed.')
+                call s:warnf('# v:exception = %s', string(v:exception))
+            endif
+        endtry
     endfor
     call s:end_test_once()
 
