@@ -60,6 +60,22 @@ function! s:locked_call(Fn, args, ...) "{{{
     endif
 endfunction "}}}
 
+
+function! simpletap#util#get_local_func(pat, funcname) "{{{
+    redir => out
+    silent scriptnames
+    redir END
+
+    for line in split(out, '\n')
+        let sid = matchstr(line, '^\s*\zs\d\+\ze:'.'\C')
+        if line =~# a:pat && sid != ''
+            return printf('<SNR>%d_%s', sid, a:funcname)
+        endif
+    endfor
+
+    return ''
+endfunction "}}}
+
 " }}}
 
 " Restore 'cpoptions' {{{
