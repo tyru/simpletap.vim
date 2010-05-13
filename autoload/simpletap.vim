@@ -595,6 +595,7 @@ function! simpletap#run(...) "{{{
                 call s:warnf('# v:exception = %s', string(v:exception))
             endif
         endtry
+        echon "\n"
     endfor
     call s:end_test_once()
 
