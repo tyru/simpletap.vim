@@ -174,7 +174,7 @@ function! s:initialize_once() "{{{
     \       'cmp_ok': 'got: %s, expected: %s',
     \       'is': 'got: %s, expected: %s',
     \       'isnt': 'got: %s, expected not: %s',
-    \       'is_deeply': 'got: %s, expected not: %s',
+    \       'is_deeply': 'got: %s, expected: %s',
     \       'like': 'got: %s, expected like: %s',
     \       'unlike': 'got: %s, expected like not: %s',
     \       'stdout_is': 'got: %s, expected: %s',
