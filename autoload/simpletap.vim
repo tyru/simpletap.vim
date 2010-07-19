@@ -593,6 +593,7 @@ function! simpletap#run(...) "{{{
             if g:simpletap#show_exception
                 call s:warn('# Exception throwed.')
                 call s:warnf('# v:exception = %s', string(v:exception))
+                call s:warnf('# v:throwpoint = %s', string(v:throwpoint))
             endif
         endtry
         echon "\n"
