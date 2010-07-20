@@ -52,6 +52,7 @@ let s:test_stat = {
 \       'done_testing': 0,
 \       'skipped': 0,
 \       'test_result': [],
+\       'test_output': [],
 \   },
 \
 \   'is_locked': 0,
@@ -283,11 +284,15 @@ endfunction "}}}
 
 
 function! s:passed(testname, funcname) "{{{
-    echomsg printf(
-    \   '%d. %s ... %s',
-    \   s:stat.get('current_test_num'),
-    \   a:testname,
-    \   g:simpletap#pass_fmt[a:funcname]
+    call s:assert(s:stat.get('current_test_num') == len(s:stat.get('test_output')) + 1)
+    call s:stat.add(
+    \   'test_output',
+    \   printf(
+    \      '%d. %s ... %s',
+    \      s:stat.get('current_test_num'),
+    \      a:testname,
+    \      g:simpletap#pass_fmt[a:funcname]
+    \   )
     \)
 
     call s:assert(s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1)
@@ -299,8 +304,10 @@ function! s:passed(testname, funcname) "{{{
 endfunction "}}}
 
 function! s:failed(testname, funcname, ...) "{{{
+    call s:assert(s:stat.get('current_test_num') == len(s:stat.get('test_output')) + 1)
     if a:0 == 0
-        call s:warn(
+        call s:stat.add(
+        \   'test_result',
         \   printf(
         \      '%d. %s ... %s',
         \      s:stat.get('current_test_num'),
@@ -311,7 +318,8 @@ function! s:failed(testname, funcname, ...) "{{{
     else
         let got = a:1
         let expected = a:2
-        call s:warn(
+        call s:stat.add(
+        \   'test_result',
         \   printf(
         \      '%d. %s ... %s',
         \      s:stat.get('current_test_num'),
@@ -475,17 +483,27 @@ function! s:end_test(file) "{{{
     endif
 endfunction "}}}
 
-function! s:source(file, silent) "{{{
-    let silent = a:silent ? 'silent' : ''
-
-    execute silent 'call s:begin_test(a:file)'
+function! s:source(file) "{{{
+    call s:begin_test(a:file)
     try
-        execute silent 'execute "source" a:file'
+        source `=a:file`
     catch /^simpletap - SKIP$/
         call s:stat.set('skipped', 1)
         throw v:exception
     finally
-        execute silent 'call s:end_test(a:file)'
+        call s:end_test(a:file)
+
+        let results = s:stat.get('test_result')
+        let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
+        let output_lines = s:stat.get('test_output')
+        for i in range(len(output_lines))
+            if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
+                " Show messages.
+                execute 'echohl' (results[i] ==# s:PASS ? 'None' : 'WarningMsg')
+                echomsg output_lines[i]
+                echohl None
+            endif
+        endfor
     endtry
 endfunction "}}}
 
@@ -569,23 +587,7 @@ function! simpletap#run(...) "{{{
 
     for t in s:glob(pat)
         try
-            if g:simpletap#show_only_failed
-                redir => output
-                    call s:source(t, 1)
-                redir END
-
-                " Show messages only when test(s) failed.
-                let failed = !empty(filter(copy(s:stat.get('test_result')), 'v:val ==# s:FAIL'))
-                if failed
-                    let lines = split(output, '\n')
-                    let lastline = remove(lines, -1)
-                    for l in lines
-                        echomsg l
-                    endfor
-                endif
-            else
-                call s:source(t, 0)
-            endif
+            call s:source(t)
 
             let tested = 1
         catch /^simpletap - SKIP$/
