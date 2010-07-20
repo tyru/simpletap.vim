@@ -599,10 +599,9 @@ function! simpletap#run(...) "{{{
     for i in range(len(output_lines))
         if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
             " Show messages.
-            execute 'echohl' (results[i] ==# s:PASS ? g:simpletap#echohl_output : g:simpletap#echohl_error)
-            echomsg output_lines[i]
+            let hl = results[i] ==# s:PASS ? g:simpletap#echohl_output : g:simpletap#echohl_error
+            call s:echomsg(hl, output_lines[i])
         endif
-        echohl None
     endfor
 
     if pass_all
