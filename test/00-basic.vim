@@ -7,6 +7,8 @@ set cpo&vim
 " }}}
 
 func! s:run() "{{{
+    Skip
+
     call simpletap#stdout_like(
     \   "call simpletap#ok(0)",
     \   'NOT ok'

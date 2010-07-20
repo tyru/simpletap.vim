@@ -6,10 +6,6 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-func! s:get_methods(obj) "{{{
-    return sort(keys(filter(copy(a:obj), 'type(v:val) == type(function("tr"))')))
-endfunc "}}}
-
 func! s:get_args(method) "{{{
     let args = {
     \   'ok': [1],
@@ -48,7 +44,7 @@ func! s:run() "{{{
 
     Diag 'OO way and function way result in same result.'
 
-    for method in s:get_methods(o)
+    for method in sort(keys(filter(copy(o), 'type(v:val) == type(function("tr"))')))
         try
             let args = s:get_args(method)
         catch /^no args$/
