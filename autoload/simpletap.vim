@@ -494,6 +494,10 @@ function! s:source(file) "{{{
     finally
         call s:end_test(a:file)
 
+        if s:stat.get('skipped')
+            return
+        endif
+
         let results = s:stat.get('test_result')
         let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
         let output_lines = s:stat.get('test_output')
