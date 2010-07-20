@@ -586,15 +586,11 @@ function! simpletap#run(...) "{{{
         let pat = printf('%s/*.vim', dir)
     endif
 
-    let tested = 0
-    let lastline = 0    " lastline is number but becomes string when test failed.
     call s:begin_test_once()
 
     for t in s:glob(pat)
         try
             call s:source(t)
-
-            let tested = 1
         catch /^simpletap - SKIP$/
         catch
             if g:simpletap#show_exception
@@ -607,17 +603,17 @@ function! simpletap#run(...) "{{{
     endfor
     call s:end_test_once()
 
-    if g:simpletap#show_only_failed
+    let results = s:stat.get('test_result')
+    let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
+    if !failed
         redraw
-        if type(lastline) == type("")
-            echomsg lastline
-        else
-            echomsg 'All test(s) passed.'
-        endif
-    endif
-    if !tested
+        execute 'echohl' g:simpletap#echohl_done
+        echomsg 'All test(s) passed.'
+        echohl None
+    elseif empty(results)
         call s:warn('no tests to run.')
     endif
+
     if g:simpletap#report
         messages
     endif
