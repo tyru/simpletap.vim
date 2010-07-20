@@ -465,7 +465,8 @@ endfunction "}}}
 
 function! s:end_test(file) "{{{
     let test_result = s:stat.get('test_result')
-    let failed_result = filter(copy(test_result), 'v:val ==# s:FAIL')
+    let failed_result_num = len(filter(copy(test_result), 'v:val ==# s:FAIL'))
+    let passed_result_num = len(test_result) - failed_result_num
 
     if s:stat.get('skipped')
         execute 'echohl' g:simpletap#echohl_skip
@@ -475,11 +476,9 @@ function! s:end_test(file) "{{{
         call s:warnf("test '%s' has not done properly.", a:file)
     elseif empty(test_result)
         call s:warnf("test '%s' has done but no tests performed.", a:file)
-    elseif !empty(failed_result)
-        call s:warnf('failed %d test(s).', len(failed_result))
     else
-        execute 'echohl' g:simpletap#echohl_done
-        echomsg 'Done.'
+        execute 'echohl' (failed_result_num ? g:simpletap#echohl_error : g:simpletap#echohl_done)
+        echomsg 'Done' passed_result_num + failed_result_num 'test(s). (PASS:' . passed_result_num . ', FAIL:' . failed_result_num . ')'
         echohl None
     endif
 endfunction "}}}
