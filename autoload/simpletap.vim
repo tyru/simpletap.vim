@@ -192,6 +192,7 @@ function! s:initialize_once() "{{{
     call s:def('echohl_begin', 'None')
     call s:def('echohl_done', 'Underlined')
     call s:def('echohl_skip', 'Underlined')
+    call s:def('echohl_output', 'None')
     call s:def('recursive', 1)
     call s:def('show_only_failed', 1)
     call s:def('show_exception', 1)
@@ -503,10 +504,10 @@ function! s:source(file) "{{{
         for i in range(len(output_lines))
             if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
                 " Show messages.
-                execute 'echohl' (results[i] ==# s:PASS ? 'None' : 'WarningMsg')
+                execute 'echohl' (results[i] ==# s:PASS ? g:simpletap#echohl_output : g:simpletap#echohl_error)
                 echomsg output_lines[i]
-                echohl None
             endif
+            echohl None
         endfor
     endtry
 endfunction "}}}
