@@ -493,15 +493,8 @@ function! s:source(file) "{{{
     call s:begin_test(a:file)
     try
         source `=a:file`
-    catch /^simpletap - SKIP$/
-        call s:stat.set('skipped', 1)
-        throw v:exception
-    finally
-        call s:end_test(a:file)
 
-        if s:stat.get('skipped')
-            return
-        endif
+        call s:end_test(a:file)
 
         let results = s:stat.get('test_result')
         let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
@@ -514,6 +507,19 @@ function! s:source(file) "{{{
             endif
             echohl None
         endfor
+
+        return failed ? 0 : 1
+    catch /^simpletap - SKIP$/
+        call s:stat.set('skipped', 1)
+        call s:end_test(a:file)
+        return 1
+    catch
+        if g:simpletap#show_exception
+            call s:warn('# Exception throwed.')
+            call s:warnf('# v:exception = %s', string(v:exception))
+            call s:warnf('# v:throwpoint = %s', string(v:throwpoint))
+        endif
+        return 0
     endtry
 endfunction "}}}
 
@@ -593,24 +599,17 @@ function! simpletap#run(...) "{{{
 
     call s:begin_test_once()
 
+    let pass_all = 1
     for t in s:glob(pat)
-        try
-            call s:source(t)
-        catch /^simpletap - SKIP$/
-        catch
-            if g:simpletap#show_exception
-                call s:warn('# Exception throwed.')
-                call s:warnf('# v:exception = %s', string(v:exception))
-                call s:warnf('# v:throwpoint = %s', string(v:throwpoint))
-            endif
-        endtry
+        if !s:source(t)
+            let pass_all = 0
+        endif
         echon "\n"
     endfor
     call s:end_test_once()
 
     let results = s:stat.get('test_result')
-    let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
-    if !failed
+    if pass_all
         call s:echomsg(g:simpletap#echohl_done, 'All test(s) passed.')
     elseif empty(results)
         call s:warn('no tests to run.')
