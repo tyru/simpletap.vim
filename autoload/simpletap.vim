@@ -49,7 +49,6 @@ let s:test_stat = {
 \   'vars': {
 \       'current_test_num': 1,
 \       'done_testing': 0,
-\       'skipped': 0,
 \       'test_result': [],
 \       'test_output': [],
 \   },
@@ -468,12 +467,12 @@ function! s:end_test_once() "{{{
     delcommand StatUnlock
 endfunction "}}}
 
-function! s:end_test(file) "{{{
+function! s:end_test(file, skipped) "{{{
     let test_result = s:stat.get('test_result')
     let failed_result_num = len(filter(copy(test_result), 'v:val ==# s:FAIL'))
     let passed_result_num = len(test_result) - failed_result_num
 
-    if s:stat.get('skipped')
+    if a:skipped
         execute 'echohl' g:simpletap#echohl_skip
         echomsg 'Skip.'
         echohl None
@@ -493,7 +492,7 @@ function! s:source(file) "{{{
     try
         source `=a:file`
 
-        call s:end_test(a:file)
+        call s:end_test(a:file, 0)
 
         let results = s:stat.get('test_result')
         let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
@@ -509,8 +508,7 @@ function! s:source(file) "{{{
 
         return failed ? 0 : 1
     catch /^simpletap - SKIP$/
-        call s:stat.set('skipped', 1)
-        call s:end_test(a:file)
+        call s:end_test(a:file, 1)
         return 1
     catch
         if g:simpletap#show_exception
