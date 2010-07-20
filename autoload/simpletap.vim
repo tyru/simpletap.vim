@@ -195,6 +195,7 @@ function! s:initialize_once() "{{{
     call s:def('recursive', 1)
     call s:def('show_only_failed', 1)
     call s:def('show_exception', 1)
+    call s:def('report', 1)
 
     delfunc s:varname
     delfunc s:def
@@ -612,6 +613,9 @@ function! simpletap#run(...) "{{{
     endif
     if !tested
         call s:warn('no tests to run.')
+    endif
+    if g:simpletap#report
+        messages
     endif
 endfunction "}}}
 call s:add_method('run')
