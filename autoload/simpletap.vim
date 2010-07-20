@@ -191,8 +191,8 @@ function! s:initialize_once() "{{{
     call s:def('echohl_begin', 'None')
     call s:def('echohl_done', 'Underlined')
     call s:def('echohl_skip', 'Underlined')
-    call s:def('recursive', 0)
-    call s:def('show_only_failed', 0)
+    call s:def('recursive', 1)
+    call s:def('show_only_failed', 1)
     call s:def('show_exception', 1)
 
     delfunc s:varname
