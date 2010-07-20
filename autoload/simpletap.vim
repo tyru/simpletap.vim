@@ -30,11 +30,10 @@ set cpo&vim
 "   - eq_set()
 "   - stderr_*()
 "     - I don't know how to implement
-" - test
-" - Show more info when test(s) failed.
-" - eskk#util#get_function({funcname}, {SID})
-"   - Get Funcref from script local function.
+" - More tests for simpletap.
 " - Define global variable or environment variable.
+" - :Is as reference equality test. :Same as current :Is.
+" - Output to buffer.
 "
 " Needless:
 " - can_ok()
