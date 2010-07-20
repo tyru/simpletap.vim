@@ -314,7 +314,7 @@ function! s:failed(testname, funcname, ...) "{{{
     call s:assert(s:stat.get('current_test_num') == len(s:stat.get('test_output')) + 1)
     if a:0 == 0
         call s:stat.add(
-        \   'test_result',
+        \   'test_output',
         \   printf(
         \      '%d. %s ... %s',
         \      s:stat.get('current_test_num'),
@@ -326,7 +326,7 @@ function! s:failed(testname, funcname, ...) "{{{
         let got = a:1
         let expected = a:2
         call s:stat.add(
-        \   'test_result',
+        \   'test_output',
         \   printf(
         \      '%d. %s ... %s',
         \      s:stat.get('current_test_num'),
