@@ -208,14 +208,19 @@ endfunction "}}}
 
 " Utilities {{{
 
-function! s:warn(...) "{{{
-    execute 'echohl' g:simpletap#echohl_error
-    echomsg join(a:000, ' ')
-    echohl None
+function! s:warn(msg) "{{{
+    call s:echomsg(g:simpletap#echohl_error, a:msg)
 endfunction "}}}
 
 function! s:warnf(...) "{{{
     call call('s:warn', [call('printf', a:000)])
+endfunction "}}}
+
+function! s:echomsg(hl, msg) "{{{
+    redraw
+    execute 'echohl' a:hl
+    echomsg a:msg
+    echohl None
 endfunction "}}}
 
 function! s:glob(expr) "{{{
@@ -606,10 +611,7 @@ function! simpletap#run(...) "{{{
     let results = s:stat.get('test_result')
     let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
     if !failed
-        redraw
-        execute 'echohl' g:simpletap#echohl_done
-        echomsg 'All test(s) passed.'
-        echohl None
+        call s:echomsg(g:simpletap#echohl_done, 'All test(s) passed.')
     elseif empty(results)
         call s:warn('no tests to run.')
     endif
