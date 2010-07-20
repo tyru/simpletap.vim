@@ -491,21 +491,9 @@ function! s:source(file) "{{{
     call s:begin_test(a:file)
     try
         source `=a:file`
-
         call s:end_test(a:file, 0)
-
         let results = s:stat.get('test_result')
         let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
-        let output_lines = s:stat.get('test_output')
-        for i in range(len(output_lines))
-            if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
-                " Show messages.
-                execute 'echohl' (results[i] ==# s:PASS ? g:simpletap#echohl_output : g:simpletap#echohl_error)
-                echomsg output_lines[i]
-            endif
-            echohl None
-        endfor
-
         return failed ? 0 : 1
     catch /^simpletap - SKIP$/
         call s:end_test(a:file, 1)
@@ -606,6 +594,17 @@ function! simpletap#run(...) "{{{
     call s:end_test_once()
 
     let results = s:stat.get('test_result')
+    let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
+    let output_lines = s:stat.get('test_output')
+    for i in range(len(output_lines))
+        if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
+            " Show messages.
+            execute 'echohl' (results[i] ==# s:PASS ? g:simpletap#echohl_output : g:simpletap#echohl_error)
+            echomsg output_lines[i]
+        endif
+        echohl None
+    endfor
+
     if pass_all
         call s:echomsg(g:simpletap#echohl_done, 'All test(s) passed.')
     elseif empty(results)
