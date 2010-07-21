@@ -546,6 +546,7 @@ endfunction "}}}
 function! s:create_buffer() "{{{
     new
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
+    setlocal filetype=simpletap-summary
     return bufnr('%')
 endfunction "}}}
 
