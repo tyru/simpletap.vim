@@ -290,7 +290,6 @@ endfunction "}}}
 
 
 function! s:passed(testname, funcname) "{{{
-    call s:assert(s:stat.get('current_test_num') == len(s:stat.get('output_info')) + 1)
     call s:stat.add(
     \   'output_info',
     \   [
@@ -313,7 +312,6 @@ function! s:passed(testname, funcname) "{{{
 endfunction "}}}
 
 function! s:failed(testname, funcname, ...) "{{{
-    call s:assert(s:stat.get('current_test_num') == len(s:stat.get('output_info')) + 1)
     if a:0 == 0
         call s:stat.add(
         \   'output_info',
@@ -449,9 +447,7 @@ endfunction "}}}
 function! s:begin_test(file) "{{{
     call s:stat.initialize()
 
-    execute 'echohl' g:simpletap#echohl_begin
-    echomsg 'Begin' '...' a:file
-    echohl None
+    call s:stat.add('output_info', [g:simpletap#echohl_begin, 'Begin ... ' . a:file])
 endfunction "}}}
 
 function! s:end_test_once() "{{{
