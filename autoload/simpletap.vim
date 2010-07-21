@@ -447,7 +447,11 @@ endfunction "}}}
 function! s:begin_test(file) "{{{
     call s:stat.initialize()
 
-    call s:stat.add('output_info', [g:simpletap#echohl_begin, 'Begin ... ' . a:file])
+    let [hl, msg] = [g:simpletap#echohl_begin, 'Testing ... ' . a:file]
+    if g:simpletap#output_to ==# 'buffer'
+        call s:echomsg(hl, msg)
+    endif
+    call s:stat.add('output_info', [hl, msg])
 endfunction "}}}
 
 function! s:end_test_once() "{{{
@@ -534,10 +538,15 @@ endfunction "}}}
 
 function! s:output_all_summary(bufnr, pass_all) "{{{
     let lines = []
+
     if a:pass_all
+        call add(lines, ['None', ''])
         call add(lines, [g:simpletap#echohl_done, 'All test(s) passed.'])
     elseif empty(s:stat.get('test_result'))
+        call add(lines, ['None', ''])
         call add(lines, [g:simpletap#echohl_error, 'no tests to run.'])
+    else
+        return
     endif
 
     call s:output(a:bufnr, lines)
@@ -634,7 +643,6 @@ function! simpletap#run(...) "{{{
             let pass_all = 0
         endif
         call s:output_summary(output_bufnr)
-        echon "\n"
     endfor
     call s:end_test_once()
 
