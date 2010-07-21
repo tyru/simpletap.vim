@@ -596,13 +596,13 @@ function! simpletap#run(...) "{{{
     let results = s:stat.get('test_result')
     let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
     let output_lines = s:stat.get('test_output')
-    for i in range(len(output_lines))
-        if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
+    if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
+        for i in range(len(output_lines))
             " Show messages.
             let hl = results[i] ==# s:PASS ? g:simpletap#echohl_output : g:simpletap#echohl_error
             call s:echomsg(hl, output_lines[i])
-        endif
-    endfor
+        endfor
+    endif
 
     if pass_all
         call s:echomsg(g:simpletap#echohl_done, 'All test(s) passed.')
