@@ -787,7 +787,7 @@ call s:add_method('stdout_unlike')
 
 
 function! simpletap#diag(...) "{{{
-    call s:echomsg(g:simpletap#echohl_diag, '# ' . join(a:000, ' '))
+    call s:stat.add('output_info', [g:simpletap#echohl_diag, '# ' . join(a:000)])
 endfunction "}}}
 call s:add_method('diag')
 
