@@ -530,6 +530,13 @@ function! s:output_summary(bufnr) "{{{
         endif
     endif
 endfunction "}}}
+
+function! s:create_buffer() "{{{
+    new
+    setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
+    return bufnr('%')
+endfunction "}}}
+
 " }}}
 
 
@@ -603,8 +610,7 @@ function! simpletap#run(...) "{{{
     " Create buffer if needed.
     let output_bufnr = -1
     if g:simpletap#output_to ==# 'buffer'
-        new
-        let output_bufnr = bufnr('%')
+        let output_bufnr = s:create_buffer()
     endif
 
     call s:begin_test_once()
