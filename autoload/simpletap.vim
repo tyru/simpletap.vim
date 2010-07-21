@@ -50,7 +50,7 @@ let s:test_stat = {
 \       'current_test_num': 1,
 \       'done_testing': 0,
 \       'test_result': [],
-\       'test_output': [],
+\       'output_info': [],
 \   },
 \
 \   'is_locked': 0,
@@ -290,15 +290,18 @@ endfunction "}}}
 
 
 function! s:passed(testname, funcname) "{{{
-    call s:assert(s:stat.get('current_test_num') == len(s:stat.get('test_output')) + 1)
+    call s:assert(s:stat.get('current_test_num') == len(s:stat.get('output_info')) + 1)
     call s:stat.add(
-    \   'test_output',
-    \   printf(
-    \      '%d. %s ... %s',
-    \      s:stat.get('current_test_num'),
-    \      a:testname,
-    \      g:simpletap#pass_fmt[a:funcname]
-    \   )
+    \   'output_info',
+    \   [
+    \       g:simpletap#echohl_output,
+    \       printf(
+    \          '%d. %s ... %s',
+    \          s:stat.get('current_test_num'),
+    \          a:testname,
+    \          g:simpletap#pass_fmt[a:funcname]
+    \       )
+    \   ]
     \)
 
     call s:assert(s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1)
@@ -310,31 +313,37 @@ function! s:passed(testname, funcname) "{{{
 endfunction "}}}
 
 function! s:failed(testname, funcname, ...) "{{{
-    call s:assert(s:stat.get('current_test_num') == len(s:stat.get('test_output')) + 1)
+    call s:assert(s:stat.get('current_test_num') == len(s:stat.get('output_info')) + 1)
     if a:0 == 0
         call s:stat.add(
-        \   'test_output',
-        \   printf(
-        \      '%d. %s ... %s',
-        \      s:stat.get('current_test_num'),
-        \      a:testname,
-        \      g:simpletap#fail_fmt[a:funcname]
-        \   )
+        \   'output_info',
+        \   [
+        \       g:simpletap#echohl_output,
+        \       printf(
+        \          '%d. %s ... %s',
+        \          s:stat.get('current_test_num'),
+        \          a:testname,
+        \          g:simpletap#fail_fmt[a:funcname]
+        \       )
+        \   ]
         \)
     else
         let got = a:1
         let expected = a:2
         call s:stat.add(
-        \   'test_output',
-        \   printf(
-        \      '%d. %s ... %s',
-        \      s:stat.get('current_test_num'),
-        \      a:testname,
-        \      printf(
-        \          g:simpletap#fail_fmt[a:funcname],
-        \          string(got),
-        \          string(expected))
-        \   )
+        \   'output_info',
+        \   [
+        \       g:simpletap#echohl_output,
+        \       printf(
+        \          '%d. %s ... %s',
+        \          s:stat.get('current_test_num'),
+        \          a:testname,
+        \          printf(
+        \              g:simpletap#fail_fmt[a:funcname],
+        \              string(got),
+        \              string(expected))
+        \       )
+        \   ]
         \)
     endif
 
@@ -474,15 +483,15 @@ function! s:end_test(file, skipped) "{{{
     let passed_result_num = len(test_result) - failed_result_num
 
     if a:skipped
-        call s:echomsg(g:simpletap#echohl_skip, 'Skip.')
+        call s:stat.add('output_info', [g:simpletap#echohl_skip, 'Skip.'])
     elseif !s:stat.get('done_testing')
         call s:warnf("test '%s' has not done properly.", a:file)
     elseif empty(test_result)
         call s:warnf("test '%s' has done but no tests performed.", a:file)
     else
         let hl = (failed_result_num ? g:simpletap#echohl_error : g:simpletap#echohl_done)
-        let msg = 'Done' passed_result_num + failed_result_num 'test(s). (PASS:' . passed_result_num . ', FAIL:' . failed_result_num . ')'
-        call s:echomsg(hl, msg)
+        let msg = printf('Done %d test(s). (PASS:%d, FAIL:%d)', passed_result_num + failed_result_num, passed_result_num, failed_result_num)
+        call s:stat.add('output_info', [hl, msg])
     endif
 endfunction "}}}
 
@@ -510,15 +519,14 @@ endfunction "}}}
 function! s:output_summary(bufnr) "{{{
     let results = s:stat.get('test_result')
     let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
-    let output_lines = s:stat.get('test_output')
+    let output_info = s:stat.get('output_info')
     if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
         if a:bufnr ==# -1
-            for i in range(len(output_lines))
-                let hl = results[i] ==# s:PASS ? g:simpletap#echohl_output : g:simpletap#echohl_error
-                call s:echomsg(hl, output_lines[i])
+            for [hl, msg] in output_info
+                call s:echomsg(hl, msg)
             endfor
         else
-            call setline(1, output_lines)
+            call setline('$', map(copy(output_info), 'v:val[1]'))
         endif
     endif
 endfunction "}}}
