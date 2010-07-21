@@ -33,7 +33,8 @@ set cpo&vim
 " - More tests for simpletap.
 " - Define global variable or environment variable.
 " - :Is as reference equality test. :Same as current :Is.
-" - Output to buffer.
+" - Show more detailed messages at s:output_all_summary().
+"   - Need to create s:stat per one script file.
 "
 " Needless:
 " - can_ok()
