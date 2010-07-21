@@ -474,17 +474,15 @@ function! s:end_test(file, skipped) "{{{
     let passed_result_num = len(test_result) - failed_result_num
 
     if a:skipped
-        execute 'echohl' g:simpletap#echohl_skip
-        echomsg 'Skip.'
-        echohl None
+        call s:echomsg(g:simpletap#echohl_skip, 'Skip.')
     elseif !s:stat.get('done_testing')
         call s:warnf("test '%s' has not done properly.", a:file)
     elseif empty(test_result)
         call s:warnf("test '%s' has done but no tests performed.", a:file)
     else
-        execute 'echohl' (failed_result_num ? g:simpletap#echohl_error : g:simpletap#echohl_done)
-        echomsg 'Done' passed_result_num + failed_result_num 'test(s). (PASS:' . passed_result_num . ', FAIL:' . failed_result_num . ')'
-        echohl None
+        let hl = (failed_result_num ? g:simpletap#echohl_error : g:simpletap#echohl_done)
+        let msg = 'Done' passed_result_num + failed_result_num 'test(s). (PASS:' . passed_result_num . ', FAIL:' . failed_result_num . ')'
+        call s:echomsg(hl, msg)
     endif
 endfunction "}}}
 
@@ -782,9 +780,7 @@ call s:add_method('stdout_unlike')
 
 
 function! simpletap#diag(...) "{{{
-    execute 'echohl' g:simpletap#echohl_diag
-    echomsg '#' join(a:000, ' ')
-    echohl None
+    call s:echomsg(g:simpletap#echohl_diag, '# ' . join(a:000, ' '))
 endfunction "}}}
 call s:add_method('diag')
 
