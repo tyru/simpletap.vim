@@ -590,11 +590,7 @@ function! simpletap#run(...) "{{{
         call s:warnf("'%s' is not directory.", dir)
         return
     endif
-    if g:simpletap#recursive
-        let pat = printf('%s/**/*.vim', dir)
-    else
-        let pat = printf('%s/*.vim', dir)
-    endif
+    let pat = dir . '/' . (g:simpletap#recursive ? '**/*.vim' : '*.vim')
 
     " Create buffer if needed.
     let output_bufnr = -1
