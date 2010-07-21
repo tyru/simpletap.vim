@@ -513,8 +513,8 @@ function! s:source(file) "{{{
 endfunction "}}}
 
 function! s:output_summary(bufnr) "{{{
-    let results = s:stat.get('test_result')
-    let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
+    let results = copy(s:stat.get('test_result'))
+    let failed = !empty(filter(results, 'v:val ==# s:FAIL'))
     let output_info = s:stat.get('output_info')
     if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
         if a:bufnr ==# -1
@@ -522,7 +522,8 @@ function! s:output_summary(bufnr) "{{{
                 call s:echomsg(hl, msg)
             endfor
         else
-            call setline('$', map(copy(output_info), 'v:val[1]'))
+            call s:assert(a:bufnr ==# bufnr('%'))
+            call setline(line('$'), map(copy(output_info), 'v:val[1]'))
         endif
     endif
 endfunction "}}}
