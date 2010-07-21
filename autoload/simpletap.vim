@@ -195,6 +195,7 @@ function! s:initialize_once() "{{{
     call s:def('show_only_failed', 1)
     call s:def('show_exception', 1)
     call s:def('report', 1)
+    call s:def('output_to', 'buffer')
 
     delfunc s:varname
     delfunc s:def
@@ -508,6 +509,21 @@ function! s:source(file) "{{{
     endtry
 endfunction "}}}
 
+function! s:output_summary(bufnr) "{{{
+    let results = s:stat.get('test_result')
+    let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
+    let output_lines = s:stat.get('test_output')
+    if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
+        if a:bufnr ==# -1
+            for i in range(len(output_lines))
+                let hl = results[i] ==# s:PASS ? g:simpletap#echohl_output : g:simpletap#echohl_error
+                call s:echomsg(hl, output_lines[i])
+            endfor
+        else
+            call setline(1, output_lines)
+        endif
+    endif
+endfunction "}}}
 " }}}
 
 
@@ -582,6 +598,13 @@ function! simpletap#run(...) "{{{
         let pat = printf('%s/*.vim', dir)
     endif
 
+    " Create buffer if needed.
+    let output_bufnr = -1
+    if g:simpletap#output_to ==# 'buffer'
+        new
+        let output_bufnr = bufnr('%')
+    endif
+
     call s:begin_test_once()
 
     let pass_all = 1
@@ -589,28 +612,19 @@ function! simpletap#run(...) "{{{
         if !s:source(t)
             let pass_all = 0
         endif
+        call s:output_summary(output_bufnr)
         echon "\n"
     endfor
     call s:end_test_once()
 
-    let results = s:stat.get('test_result')
-    let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
-    let output_lines = s:stat.get('test_output')
-    if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
-        for i in range(len(output_lines))
-            " Show messages.
-            let hl = results[i] ==# s:PASS ? g:simpletap#echohl_output : g:simpletap#echohl_error
-            call s:echomsg(hl, output_lines[i])
-        endfor
-    endif
-
+    " Small summary of all.
     if pass_all
         call s:echomsg(g:simpletap#echohl_done, 'All test(s) passed.')
-    elseif empty(results)
+    elseif empty(s:stat.get('test_result'))
         call s:warn('no tests to run.')
     endif
 
-    if g:simpletap#report
+    if g:simpletap#report && output_bufnr ==# -1
         messages
     endif
 endfunction "}}}
