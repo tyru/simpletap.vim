@@ -512,20 +512,35 @@ function! s:source(file) "{{{
     endtry
 endfunction "}}}
 
+function! s:output(bufnr, lines) "{{{
+    if a:bufnr ==# -1
+        for [hl, msg] in a:lines
+            call s:echomsg(hl, msg)
+        endfor
+    else
+        call s:assert(a:bufnr ==# bufnr('%'))
+        call setline(line('$'), map(copy(a:lines), 'v:val[1]'))
+    endif
+endfunction "}}}
+
 function! s:output_summary(bufnr) "{{{
     let results = copy(s:stat.get('test_result'))
     let failed = !empty(filter(results, 'v:val ==# s:FAIL'))
     let output_info = s:stat.get('output_info')
     if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
-        if a:bufnr ==# -1
-            for [hl, msg] in output_info
-                call s:echomsg(hl, msg)
-            endfor
-        else
-            call s:assert(a:bufnr ==# bufnr('%'))
-            call setline(line('$'), map(copy(output_info), 'v:val[1]'))
-        endif
+        call s:output(a:bufnr, output_info)
     endif
+endfunction "}}}
+
+function! s:output_all_summary(bufnr, pass_all) "{{{
+    let lines = []
+    if a:pass_all
+        call add(lines, [g:simpletap#echohl_done, 'All test(s) passed.'])
+    elseif empty(s:stat.get('test_result'))
+        call add(lines, [g:simpletap#echohl_error, 'no tests to run.'])
+    endif
+
+    call s:output(a:bufnr, lines)
 endfunction "}}}
 
 function! s:create_buffer() "{{{
@@ -622,12 +637,7 @@ function! simpletap#run(...) "{{{
     endfor
     call s:end_test_once()
 
-    " Small summary of all.
-    if pass_all
-        call s:echomsg(g:simpletap#echohl_done, 'All test(s) passed.')
-    elseif empty(s:stat.get('test_result'))
-        call s:warn('no tests to run.')
-    endif
+    call s:output_all_summary(output_bufnr, pass_all)
 
     if g:simpletap#report && output_bufnr ==# -1
         messages
