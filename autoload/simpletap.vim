@@ -644,6 +644,7 @@ function! simpletap#run_file(file) "{{{
         messages
     endif
 endfunction "}}}
+call s:add_method('run_file')
 
 function! simpletap#run_dir(dir) "{{{
     let dir = expand(a:dir)
@@ -674,7 +675,7 @@ function! simpletap#run_dir(dir) "{{{
         messages
     endif
 endfunction "}}}
-call s:add_method('run')
+call s:add_method('run_dir')
 
 
 function! simpletap#ok(cond, ...) "{{{
