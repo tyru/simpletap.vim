@@ -660,7 +660,6 @@ function! simpletap#run_dir(dir) "{{{
     endif
 
     call s:begin_test_once()
-
     let pass_all = 1
     for t in s:glob(pat)
         if !s:source(t)
@@ -669,7 +668,6 @@ function! simpletap#run_dir(dir) "{{{
         call s:output_summary(output_bufnr)
     endfor
     call s:end_test_once()
-
     call s:output_all_summary(output_bufnr, pass_all)
 
     if g:simpletap#report && output_bufnr ==# -1
