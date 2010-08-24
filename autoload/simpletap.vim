@@ -186,7 +186,6 @@ function! s:initialize_once() "{{{
     \   },
     \)
     call s:def('silent', 1)
-    call s:def('test_dir', '%:p:h')
     call s:def('echohl_diag', 'Comment')
     call s:def('echohl_error', 'WarningMsg')
     call s:def('echohl_begin', 'None')
@@ -622,9 +621,8 @@ endfunction "}}}
 
 " Autoload {{{
 
-function! simpletap#run(...) "{{{
-    let dir = a:0 != 0 ? a:1 : g:simpletap#test_dir
-    let dir = expand(dir)
+function! simpletap#run(dir) "{{{
+    let dir = expand(a:dir)
     if !isdirectory(dir)
         call s:warnf("'%s' is not directory.", dir)
         return
