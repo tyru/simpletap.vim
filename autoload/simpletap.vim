@@ -856,9 +856,6 @@ endfunction "}}}
 
 " }}}
 
-" Commands {{{
-" }}}
-
 call s:initialize_once()
 
 " Restore 'cpoptions' {{{
