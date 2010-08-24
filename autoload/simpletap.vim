@@ -621,7 +621,7 @@ endfunction "}}}
 
 " Autoload {{{
 
-function! simpletap#run(dir) "{{{
+function! simpletap#run_dir(dir) "{{{
     let dir = expand(a:dir)
     if !isdirectory(dir)
         call s:warnf("'%s' is not directory.", dir)
