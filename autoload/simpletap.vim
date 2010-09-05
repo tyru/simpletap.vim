@@ -312,10 +312,6 @@ function! s:passed(testname, funcname) "{{{
     \   ]
     \)
 
-    call s:assert(
-    \   s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1,
-    \   "s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1",
-    \)
     call s:stat.add('test_result', s:PASS)
 
     call s:step_num()
@@ -359,10 +355,6 @@ function! s:failed(testname, funcname, ...) "{{{
         endif
     endif
 
-    call s:assert(
-    \   s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1,
-    \   "s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1",
-    \)
     call s:stat.add('test_result', s:FAIL)
 
     call s:step_num()
