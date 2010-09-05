@@ -264,6 +264,14 @@ function! s:get_output(Code) "{{{
     endtry
 endfunction "}}}
 
+function! s:format_to_string(val) "{{{
+    if exists('g:loaded_prettyprint')
+        return PrettyPrint(a:val)
+    else
+        return string(a:val)
+    endif
+endfunction "}}}
+
 
 function! s:equal(l, r) "{{{
     return type(a:l) == type(a:r)
@@ -329,21 +337,23 @@ function! s:failed(testname, funcname, ...) "{{{
     else
         let got = a:1
         let expected = a:2
-        call s:stat.add(
-        \   'output_info',
-        \   [
-        \       g:simpletap#echohl_output,
-        \       printf(
-        \          '%d. %s ... %s',
-        \          s:stat.get('current_test_num'),
-        \          a:testname,
-        \          printf(
-        \              g:simpletap#fail_fmt[a:funcname],
-        \              string(got),
-        \              string(expected))
-        \       )
-        \   ]
+        let msg = printf(
+        \   '%d. %s ... %s',
+        \   s:stat.get('current_test_num'),
+        \   a:testname,
+        \   printf(
+        \       g:simpletap#fail_fmt[a:funcname],
+        \       s:format_to_string(got),
+        \       s:format_to_string(expected)
+        \   )
         \)
+        if stridx(msg, "\n")
+            for l in split(msg, '\n')
+                call s:stat.add('output_info', [g:simpletap#echohl_output, l])
+            endfor
+        else
+            call s:stat.add('output_info', [g:simpletap#echohl_output, msg])
+        endif
     endif
 
     call s:assert(s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1)
