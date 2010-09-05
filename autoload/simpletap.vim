@@ -53,6 +53,7 @@ let s:test_stat = {
 \       'done_testing': 0,
 \       'test_result': [],
 \       'output_info': [],
+\       'finalizer': {},
 \   },
 \
 \   'is_locked': 0,
@@ -524,6 +525,15 @@ function! s:source(file) "{{{
             call s:warnf('# v:throwpoint = %s', string(v:throwpoint))
         endif
         return 0
+    finally
+        let f = s:stat.get('finalizer')
+        for name in sort(keys(f))
+            let call_args = [f[name].fn, f[name].args, f[name]]
+            if has_key(f[name], 'dict')
+                call add(call_args, f[name].dict)
+            endif
+            call call('call', call_args)
+        endfor
     endtry
 endfunction "}}}
 
@@ -630,6 +640,11 @@ endfunction "}}}
 " }}}
 
 " Autoload {{{
+
+function! simpletap#finalizer() "{{{
+    return s:stat.get('finalizer')
+endfunction "}}}
+
 
 function! simpletap#run_file(file) "{{{
     let file = expand(a:file)
