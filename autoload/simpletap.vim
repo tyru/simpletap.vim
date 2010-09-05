@@ -533,7 +533,7 @@ function! s:source(file) "{{{
         return 0
     finally
         let f = s:stat.get('finalizer')
-        for name in sort(keys(f))
+        for name in empty(f) ? [] : sort(keys(f))
             let call_args = [f[name].fn, f[name].args, f[name]]
             if has_key(f[name], 'dict')
                 call add(call_args, f[name].dict)
