@@ -73,7 +73,7 @@ endfunction "}}}
 function! s:test_stat.get(varname) dict "{{{
     call s:assert(has_key(self.vars, a:varname))
 
-    return copy(self.vars[a:varname])
+    return self.vars[a:varname]
 endfunction "}}}
 
 function! s:test_stat.set(varname, value) dict "{{{
