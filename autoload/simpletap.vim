@@ -71,13 +71,10 @@ function! s:test_stat.initialize() dict "{{{
 endfunction "}}}
 
 function! s:test_stat.get(varname) dict "{{{
-    call s:assert(has_key(self.vars, a:varname))
-
     return self.vars[a:varname]
 endfunction "}}}
 
 function! s:test_stat.set(varname, value) dict "{{{
-    call s:assert(has_key(self.vars, a:varname))
     if self.is_locked | return | endif
 
     let self.vars[a:varname] = a:value
@@ -87,7 +84,7 @@ function! s:test_stat.increment(varname) dict "{{{
     if self.is_locked | return | endif
 
     let val = self.get(a:varname)
-    call s:assert(type(val) == type(0))
+    call s:assert(type(val) == type(0), 'type(val) is Number')
     call self.set(a:varname, val + 1)
 endfunction "}}}
 
@@ -95,7 +92,7 @@ function! s:test_stat.add(varname, value) dict "{{{
     if self.is_locked | return | endif
 
     let list = self.get(a:varname)
-    call s:assert(type(list) == type([]))
+    call s:assert(type(list) == type([]), 'type(list) is List')
     call self.set(a:varname, add(list, a:value))
 endfunction "}}}
 
@@ -125,7 +122,9 @@ function! simpletap#load() "{{{
 endfunction "}}}
 
 function! simpletap#define_macro() "{{{
+    call s:stat.initialize()
     call s:begin_test_once()
+    call s:stat.initialize()
 endfunction "}}}
 
 function! s:initialize_once() "{{{
@@ -232,9 +231,9 @@ function! s:error(msg) "{{{
     return "simpletap:" . a:msg
 endfunction "}}}
 
-function! s:assert(cond) "{{{
+function! s:assert(cond, msg) "{{{
     if !a:cond
-        throw s:error("assertion failure")
+        throw s:error("assertion failure: " . a:msg)
     endif
 endfunction "}}}
 
@@ -313,7 +312,10 @@ function! s:passed(testname, funcname) "{{{
     \   ]
     \)
 
-    call s:assert(s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1)
+    call s:assert(
+    \   s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1,
+    \   "s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1",
+    \)
     call s:stat.add('test_result', s:PASS)
 
     call s:step_num()
@@ -357,7 +359,10 @@ function! s:failed(testname, funcname, ...) "{{{
         endif
     endif
 
-    call s:assert(s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1)
+    call s:assert(
+    \   s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1,
+    \   "s:stat.get('current_test_num') == len(s:stat.get('test_result')) + 1",
+    \)
     call s:stat.add('test_result', s:FAIL)
 
     call s:step_num()
@@ -549,7 +554,7 @@ function! s:output(bufnr, lines) "{{{
             call s:echomsg(hl, msg)
         endfor
     else
-        call s:assert(a:bufnr ==# bufnr('%'))
+        call s:assert(a:bufnr ==# bufnr('%'), 's:output(): a:bufnr is current buffer')
         call setline(line('$'), map(copy(a:lines), 'v:val[1]'))
     endif
 endfunction "}}}
