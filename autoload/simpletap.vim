@@ -519,11 +519,17 @@ function! s:source(file) "{{{
         call s:end_test(a:file, 1)
         return 1
     catch
-        if g:simpletap#show_exception
-            call s:warn('# Exception throwed.')
-            call s:warnf('# v:exception = %s', string(v:exception))
-            call s:warnf('# v:throwpoint = %s', string(v:throwpoint))
-        endif
+        for msg in [
+        \   '# Exception throwed.',
+        \   '# v:exception = ' . string(v:exception),
+        \   '# v:throwpoint = ' . string(v:throwpoint),
+        \]
+            if g:simpletap#show_exception
+                call s:warn(msg)
+            endif
+            call s:stat.add('output_info', [g:simpletap#echohl_error, msg])
+        endfor
+        call s:stat.add('test_result', s:FAIL)    " dummy
         return 0
     finally
         let f = s:stat.get('finalizer')
