@@ -649,6 +649,17 @@ function! simpletap#finalizer() "{{{
 endfunction "}}}
 
 
+function! simpletap#run(path) "{{{
+    if getftype(a:path) == ''
+        return
+    endif
+    if isdirectory(a:path)
+        call simpletap#run_dir(a:path)
+    else
+        call simpletap#run_file(a:path)
+    endif
+endfunction "}}}
+
 function! simpletap#run_file(file) "{{{
     let file = expand(a:file)
     if !filereadable(file)

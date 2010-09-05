@@ -14,6 +14,11 @@ set cpo&vim
 
 
 command!
+\   -nargs=1 -complete=file
+\   SimpleTapRun
+\   call simpletap#run(<q-args>)
+
+command!
 \   -nargs=? -complete=dir
 \   SimpleTapRunDir
 \   call simpletap#run_dir(<q-args> == '' ? getcwd() : <q-args>)
