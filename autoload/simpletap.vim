@@ -1,4 +1,4 @@
-" vim:foldmethod=marker:fen:
+" vim:foldmethod=marker:fen:sw=4:sts=4
 scriptencoding utf-8
 
 " NEW BSD LICENSE {{{
@@ -326,7 +326,7 @@ function! s:failed(testname, funcname, ...) "{{{
         \   [
         \       g:simpletap#echohl_output,
         \       printf(
-        \          '%d. %s ... %s',
+        \          '!!!%d. %s ... %s',
         \          s:stat.get('current_test_num'),
         \          a:testname,
         \          g:simpletap#fail_fmt[a:funcname]
@@ -348,10 +348,10 @@ function! s:failed(testname, funcname, ...) "{{{
         \)
         if stridx(msg, "\n")
             for l in split(msg, '\n')
-                call s:stat.add('output_info', [g:simpletap#echohl_output, l])
+                call s:stat.add('output_info', [g:simpletap#echohl_output, '!!!' . l])
             endfor
         else
-            call s:stat.add('output_info', [g:simpletap#echohl_output, msg])
+            call s:stat.add('output_info', [g:simpletap#echohl_output, '!!!' . msg])
         endif
     endif
 
@@ -517,9 +517,9 @@ function! s:source(file) "{{{
         return 1
     catch
         for msg in [
-        \   '# Exception throwed.',
-        \   '# v:exception = ' . string(v:exception),
-        \   '# v:throwpoint = ' . string(v:throwpoint),
+        \   '!!!# Exception throwed.',
+        \   '!!!# v:exception = ' . string(v:exception),
+        \   '!!!# v:throwpoint = ' . string(v:throwpoint),
         \]
             if g:simpletap#show_exception
                 call s:warn(msg)
@@ -578,8 +578,28 @@ endfunction "}}}
 
 function! s:create_buffer() "{{{
     new
+    
+    " Clean up the screen.
+    % delete _
+    
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
     setlocal filetype=simpletap-summary
+    
+    if has('conceal')
+        setlocal conceallevel=3
+        setlocal concealcursor=n
+
+        syntax match   simpletapErrorHidden            '^!!!' contained conceal
+    else
+        syntax match   simpletapErrorHidden            '^!!!' contained
+    endif
+    syntax match simpletapError   '^!!!.*' contains=simpletapErrorHidden
+    syntax match simpletapMessage   '^#.*'
+    
+    highlight def link simpletapError Error
+    highlight def link simpletapErrorHidden Ignore
+    highlight def link simpletapMessage Comment
+    
     return bufnr('%')
 endfunction "}}}
 
