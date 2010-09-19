@@ -1,4 +1,4 @@
-" vim:foldmethod=marker:fen:
+" vim:foldmethod=marker:fen:sw=4:sts=4
 scriptencoding utf-8
 
 " NEW BSD LICENSE {{{
@@ -326,7 +326,7 @@ function! s:failed(testname, funcname, ...) "{{{
         \   [
         \       g:simpletap#echohl_output,
         \       printf(
-        \          '%d. %s ... %s',
+        \          '!!!%d. %s ... %s !!!',
         \          s:stat.get('current_test_num'),
         \          a:testname,
         \          g:simpletap#fail_fmt[a:funcname]
@@ -337,7 +337,7 @@ function! s:failed(testname, funcname, ...) "{{{
         let got = a:1
         let expected = a:2
         let msg = printf(
-        \   '%d. %s ... %s',
+        \   '!!!%d. %s ... %s!!!',
         \   s:stat.get('current_test_num'),
         \   a:testname,
         \   printf(
@@ -517,9 +517,9 @@ function! s:source(file) "{{{
         return 1
     catch
         for msg in [
-        \   '# Exception throwed.',
+        \   '!!!# Exception throwed.',
         \   '# v:exception = ' . string(v:exception),
-        \   '# v:throwpoint = ' . string(v:throwpoint),
+        \   '# v:throwpoint = ' . string(v:throwpoint) . '!!!',
         \]
             if g:simpletap#show_exception
                 call s:warn(msg)
@@ -580,6 +580,20 @@ function! s:create_buffer() "{{{
     new
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
     setlocal filetype=simpletap-summary
+    
+    if has('conceal')
+        setlocal conceallevel=3
+        setlocal concealcursor=n
+
+        syn match   simpletapErrorHidden            '!!!' contained conceal
+    else
+        syn match   simpletapErrorHidden            '!!!' contained
+    endif
+    syn region   simpletapError   start=+!!!+ end=+!!!+ contains=simpletapErrorHidden
+    
+    hi def link simpletapError Error
+    hi def link simpletapErrorHidden Ignore
+    
     return bufnr('%')
 endfunction "}}}
 
