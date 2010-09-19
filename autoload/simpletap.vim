@@ -326,7 +326,7 @@ function! s:failed(testname, funcname, ...) "{{{
         \   [
         \       g:simpletap#echohl_output,
         \       printf(
-        \          '!!!%d. %s ... %s !!!',
+        \          '!!!%d. %s ... %s',
         \          s:stat.get('current_test_num'),
         \          a:testname,
         \          g:simpletap#fail_fmt[a:funcname]
@@ -337,7 +337,7 @@ function! s:failed(testname, funcname, ...) "{{{
         let got = a:1
         let expected = a:2
         let msg = printf(
-        \   '!!!%d. %s ... %s!!!',
+        \   '%d. %s ... %s',
         \   s:stat.get('current_test_num'),
         \   a:testname,
         \   printf(
@@ -348,10 +348,10 @@ function! s:failed(testname, funcname, ...) "{{{
         \)
         if stridx(msg, "\n")
             for l in split(msg, '\n')
-                call s:stat.add('output_info', [g:simpletap#echohl_output, l])
+                call s:stat.add('output_info', [g:simpletap#echohl_output, '!!!' . l])
             endfor
         else
-            call s:stat.add('output_info', [g:simpletap#echohl_output, msg])
+            call s:stat.add('output_info', [g:simpletap#echohl_output, '!!!' . msg])
         endif
     endif
 
@@ -518,8 +518,8 @@ function! s:source(file) "{{{
     catch
         for msg in [
         \   '!!!# Exception throwed.',
-        \   '# v:exception = ' . string(v:exception),
-        \   '# v:throwpoint = ' . string(v:throwpoint) . '!!!',
+        \   '!!!# v:exception = ' . string(v:exception),
+        \   '!!!# v:throwpoint = ' . string(v:throwpoint),
         \]
             if g:simpletap#show_exception
                 call s:warn(msg)
@@ -578,6 +578,10 @@ endfunction "}}}
 
 function! s:create_buffer() "{{{
     new
+    
+    " Clean up the screen.
+    % delete _
+    
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
     setlocal filetype=simpletap-summary
     
@@ -585,14 +589,16 @@ function! s:create_buffer() "{{{
         setlocal conceallevel=3
         setlocal concealcursor=n
 
-        syn match   simpletapErrorHidden            '!!!' contained conceal
+        syntax match   simpletapErrorHidden            '^!!!' contained conceal
     else
-        syn match   simpletapErrorHidden            '!!!' contained
+        syntax match   simpletapErrorHidden            '^!!!' contained
     endif
-    syn region   simpletapError   start=+!!!+ end=+!!!+ contains=simpletapErrorHidden
+    syntax match simpletapError   '^!!!.*' contains=simpletapErrorHidden
+    syntax match simpletapMessage   '^#.*'
     
-    hi def link simpletapError Error
-    hi def link simpletapErrorHidden Ignore
+    highlight def link simpletapError Error
+    highlight def link simpletapErrorHidden Ignore
+    highlight def link simpletapMessage Comment
     
     return bufnr('%')
 endfunction "}}}
