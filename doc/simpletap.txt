@@ -1,0 +1,46 @@
+*simpletap.txt* *simpletap*
+
+Author:
+  tyru <tyru.exe@gmail.com>
+Version: 0.0.0
+License: Under the same license as Vim itself (see :help license)
+
+==============================================================================
+CONTENTS						*simpletap-contents*
+
+Introduction		|simpletap-introduction|
+Interface			|simpletap-interface|
+  Keymappings		|simpletap-keymappings|
+  Variables			|simpletap-variables|
+  Commands			|simpletap-commands|
+TODO				|simpletap-todo|
+Changelog			|simpletap-changelog|
+
+
+==============================================================================
+INTRODUCTION						*simpletap-introduction* {{{
+}}}
+==============================================================================
+INTERFACE				*simpletap-interface* {{{
+------------------------------------------------------------------------------
+KEYMAPPINGS					*simpletap-keymappings* {{{
+}}}
+------------------------------------------------------------------------------
+VARIABLES					*simpletap-variables* {{{
+}}}
+------------------------------------------------------------------------------
+COMMANDS					*simpletap-commands* {{{
+}}}
+}}}
+==============================================================================
+TODO						*simpletap-todo* {{{
+}}}
+==============================================================================
+CHANGELOG						*simpletap-changelog* {{{
+
+0.0.0:
+- Initial upload
+
+}}}
+==============================================================================
+vim:tw=78:fo=tcq2mM:ts=4:ft=help:norl:noet:fdm=marker:fen
