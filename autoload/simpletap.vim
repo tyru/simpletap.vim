@@ -274,10 +274,10 @@ function! s:equal_deeply(l, r) "{{{
     \   && a:l ==# a:r
 endfunction "}}}
 
-function! s:like(got, regex) "{{{
-    return type(a:got) == type("")
+function! s:like(Got, regex) "{{{
+    return type(a:Got) == type("")
     \   && type(a:regex) == type("")
-    \   && a:got =~# a:regex
+    \   && a:Got =~# a:regex
 endfunction "}}}
 
 function! s:cmp(l, op, r) "{{{
@@ -321,16 +321,16 @@ function! s:failed(testname, funcname, ...) "{{{
         \   ]
         \)
     else
-        let got = a:1
-        let expected = a:2
+        let Got = a:1
+        let Expected = a:2
         let msg = printf(
         \   '%d. %s ... %s',
         \   s:stat.get('current_test_num'),
         \   a:testname,
         \   printf(
         \       g:simpletap#fail_fmt[a:funcname],
-        \       s:format_to_string(got),
-        \       s:format_to_string(expected)
+        \       s:format_to_string(Got),
+        \       s:format_to_string(Expected)
         \   )
         \)
         if stridx(msg, "\n")
@@ -736,72 +736,72 @@ endfunction "}}}
 call s:add_method('ok')
 
 
-function! simpletap#cmp_ok(got, op, expected, ...) "{{{
+function! simpletap#cmp_ok(Got, op, Expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
-    if s:cmp(a:got, a:op, a:expected)
+    if s:cmp(a:Got, a:op, a:Expected)
         return s:passed(testname, 'cmp_ok')
     else
         " TODO Output a:op.
-        return s:failed(testname, 'cmp_ok', a:got, a:expected)
+        return s:failed(testname, 'cmp_ok', a:Got, a:Expected)
     endif
 endfunction "}}}
 call s:add_method('cmp_ok')
 
 
-function! simpletap#is(got, expected, ...) "{{{
+function! simpletap#is(Got, Expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
-    if s:equal(a:got, a:expected)
+    if s:equal(a:Got, a:Expected)
         return s:passed(testname, 'is')
     else
-        return s:failed(testname, 'is', a:got, a:expected)
+        return s:failed(testname, 'is', a:Got, a:Expected)
     endif
 endfunction "}}}
 call s:add_method('is')
 
-function! simpletap#isnt(got, expected, ...) "{{{
+function! simpletap#isnt(Got, Expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
-    if !s:equal(a:got, a:expected)
+    if !s:equal(a:Got, a:Expected)
         return s:passed(testname, 'isnt')
     else
-        return s:failed(testname, 'isnt', a:got, a:expected)
+        return s:failed(testname, 'isnt', a:Got, a:Expected)
     endif
 endfunction "}}}
 call s:add_method('isnt')
 
 
-function! simpletap#is_deeply(got, expected, ...) "{{{
+function! simpletap#is_deeply(Got, Expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
-    if s:equal_deeply(a:got, a:expected)
+    if s:equal_deeply(a:Got, a:Expected)
         return s:passed(testname, 'is_deeply')
     else
-        return s:failed(testname, 'is_deeply', a:got, a:expected)
+        return s:failed(testname, 'is_deeply', a:Got, a:Expected)
     endif
 endfunction "}}}
 call s:add_method('is_deeply')
 
 
-function! simpletap#like(got, regex, ...) "{{{
+function! simpletap#like(Got, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
-    if s:like(a:got, a:regex)
+    if s:like(a:Got, a:regex)
         return s:passed(testname, 'like')
     else
-        return s:failed(testname, 'like', a:got, a:regex)
+        return s:failed(testname, 'like', a:Got, a:regex)
     endif
 endfunction "}}}
 call s:add_method('like')
 
-function! simpletap#unlike(got, regex, ...) "{{{
+function! simpletap#unlike(Got, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
-    if !s:like(a:got, a:regex)
+    if !s:like(a:Got, a:regex)
         return s:passed(testname, 'unlike')
     else
-        return s:failed(testname, 'unlike', a:got, a:regex)
+        return s:failed(testname, 'unlike', a:Got, a:regex)
     endif
 endfunction "}}}
 call s:add_method('unlike')
@@ -825,26 +825,26 @@ endfunction "}}}
 call s:add_method('throws_ok')
 
 
-function! simpletap#stdout_is(Code, expected, ...) "{{{
+function! simpletap#stdout_is(Code, Expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     let output = s:get_output(a:Code)
-    if s:equal(output, a:expected)
+    if s:equal(output, a:Expected)
         return s:passed(testname, 'stdout_is')
     else
-        return s:failed(testname, 'stdout_is', output, a:expected)
+        return s:failed(testname, 'stdout_is', output, a:Expected)
     endif
 endfunction "}}}
 call s:add_method('stdout_is')
 
-function! simpletap#stdout_isnt(Code, expected, ...) "{{{
+function! simpletap#stdout_isnt(Code, Expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     let output = s:get_output(a:Code)
-    if !s:equal(output, a:expected)
+    if !s:equal(output, a:Expected)
         return s:passed(testname, 'stdout_isnt')
     else
-        return s:failed(testname, 'stdout_isnt', output, a:expected)
+        return s:failed(testname, 'stdout_isnt', output, a:Expected)
     endif
 endfunction "}}}
 call s:add_method('stdout_isnt')
