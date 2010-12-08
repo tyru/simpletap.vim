@@ -1070,7 +1070,7 @@ function! {s:Simpletap.method('fail')}(this) "{{{
     return a:this.ok(0)
 endfunction "}}}
 
-function! {s:Simpletap.method('skip')}(this) "{{{
+function! {s:Simpletap.method('skip')}(this, ...) "{{{
     if a:0 != 0
         Diag a:1
     endif
