@@ -1051,6 +1051,10 @@ function! {s:Simpletap.method('diag')}(this, ...) "{{{
     call s:stat.add('output_info', [g:simpletap#echohl_diag, '# ' . join(a:000)])
 endfunction "}}}
 
+function! {s:Simpletap.method('pass')}(this) "{{{
+    return a:this.ok(1)
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
