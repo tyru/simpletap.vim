@@ -1169,6 +1169,49 @@ function! {s:Stat.method('passed')}(this, testname, funcname) "{{{
     return 1
 endfunction "}}}
 
+function! {s:Stat.method('failed')}(this, testname, funcname, ...) "{{{
+    if a:0 == 0
+        call a:this.add(
+        \   'output_info',
+        \   [
+        \       g:simpletap#echohl_output,
+        \       printf(
+        \          '!!!%d. %s ... %s',
+        \          a:this.get('current_test_num'),
+        \          a:testname,
+        \          g:simpletap#fail_fmt[a:funcname]
+        \       )
+        \   ]
+        \)
+    else
+        let Got = a:1
+        let Expected = a:2
+        let msg = printf(
+        \   '%d. %s ... %s',
+        \   a:this.get('current_test_num'),
+        \   a:testname,
+        \   printf(
+        \       g:simpletap#fail_fmt[a:funcname],
+        \       s:format_to_string(Got),
+        \       s:format_to_string(Expected)
+        \   )
+        \)
+        if stridx(msg, "\n")
+            for l in split(msg, '\n')
+                call a:this.add('output_info', [g:simpletap#echohl_output, '!!!' . l])
+            endfor
+        else
+            call a:this.add('output_info', [g:simpletap#echohl_output, '!!!' . msg])
+        endif
+    endif
+
+    call a:this.add('test_result', s:FAIL)
+
+    call s:step_num()
+
+    return 0
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
