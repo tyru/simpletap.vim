@@ -1281,6 +1281,15 @@ function! {s:Stat.method('source')}(this, file) "{{{
     endtry
 endfunction "}}}
 
+function! {s:Stat.method('output_summary')}(this, bufnr) "{{{
+    let results = copy(a:this.get('test_result'))
+    let failed = !empty(filter(results, 'v:val ==# s:FAIL'))
+    let output_info = a:this.get('output_info')
+    if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
+        call s:output(a:bufnr, output_info)
+    endif
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
