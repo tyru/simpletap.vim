@@ -308,16 +308,6 @@ function! s:begin_test_once() "{{{
     call s:set_up_variables()
 endfunction "}}}
 
-function! s:begin_test(file) "{{{
-    call s:stat.initialize()
-
-    let [hl, msg] = [g:simpletap#echohl_begin, 'Testing ... ' . a:file]
-    if g:simpletap#output_to ==# 'buffer'
-        call s:echomsg(hl, msg)
-    endif
-    call s:stat.add('output_info', [hl, msg])
-endfunction "}}}
-
 function! s:end_test_once() "{{{
     delcommand OK
     delcommand Ok
@@ -360,7 +350,7 @@ function! s:end_test(file, skipped) "{{{
 endfunction "}}}
 
 function! s:source(file) "{{{
-    call s:begin_test(a:file)
+    call s:stat.begin_test(a:file)
     try
         source `=a:file`
         call s:end_test(a:file, 0)
@@ -983,7 +973,7 @@ function! {s:Stat.method('end_test')}(this, file, skipped) "{{{
 endfunction "}}}
 
 function! {s:Stat.method('source')}(this, file) "{{{
-    call s:begin_test(a:file)
+    call a:this.begin_test(a:file)
     try
         source `=a:file`
         call s:end_test(a:file, 0)
