@@ -235,7 +235,7 @@ function! s:passed(testname, funcname) "{{{
 
     call s:stat.add('test_result', s:PASS)
 
-    call s:step_num()
+    call s:stat.step_num()
 
     return 1
 endfunction "}}}
@@ -278,13 +278,9 @@ function! s:failed(testname, funcname, ...) "{{{
 
     call s:stat.add('test_result', s:FAIL)
 
-    call s:step_num()
+    call s:stat.step_num()
 
     return 0
-endfunction "}}}
-
-function! s:step_num() "{{{
-    call s:stat.increment('current_test_num')
 endfunction "}}}
 
 
@@ -969,7 +965,7 @@ function! {s:Stat.method('passed')}(this, testname, funcname) "{{{
 
     call a:this.add('test_result', s:PASS)
 
-    call s:step_num()
+    call a:this.step_num()
 
     return 1
 endfunction "}}}
@@ -1012,7 +1008,7 @@ function! {s:Stat.method('failed')}(this, testname, funcname, ...) "{{{
 
     call a:this.add('test_result', s:FAIL)
 
-    call s:step_num()
+    call a:this.step_num()
 
     return 0
 endfunction "}}}
