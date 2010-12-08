@@ -37,8 +37,7 @@ let s:runner = {}
 let s:tap = {}
 let s:stat = {}
 
-let s:PASS = 1
-let s:FAIL = 2
+let [s:PASS, s:FAIL] = range(2)
 
 
 
