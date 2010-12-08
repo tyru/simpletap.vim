@@ -184,18 +184,18 @@ endfunction "}}}
 
 " Equality check functions
 
-function! s:equal(l, r) "{{{
-    return type(a:l) == type(a:r)
-    \   && type(a:l) != type({})
-    \   && type(a:l) != type([])
-    \   && type(a:r) != type({})
-    \   && type(a:r) != type([])
-    \   && a:l ==# a:r
+function! s:equal(L, R) "{{{
+    return type(a:L) == type(a:R)
+    \   && type(a:L) != type({})
+    \   && type(a:L) != type([])
+    \   && type(a:R) != type({})
+    \   && type(a:R) != type([])
+    \   && a:L ==# a:R
 endfunction "}}}
 
-function! s:equal_deeply(l, r) "{{{
-    return type(a:l) == type(a:r)
-    \   && a:l ==# a:r
+function! s:equal_deeply(L, R) "{{{
+    return type(a:L) == type(a:R)
+    \   && a:L ==# a:R
 endfunction "}}}
 
 function! s:like(Got, regex) "{{{
@@ -204,8 +204,8 @@ function! s:like(Got, regex) "{{{
     \   && a:Got =~# a:regex
 endfunction "}}}
 
-function! s:cmp(l, op, r) "{{{
-    return eval(printf('a:l %s a:r', a:op))
+function! s:cmp(L, op, R) "{{{
+    return eval(printf('a:L %s a:R', a:op))
 endfunction "}}}
 
 
