@@ -916,6 +916,10 @@ let s:Simpletap = vice#class(
 \   {'generate_stub': 1}
 \)
 
+function! {s:Simpletap.constructor()}(this) "{{{
+    let a:this._stat = s:test_vars_new()
+endfunction "}}}
+
 function! {s:Simpletap.method('ok')}(this, cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
@@ -1048,7 +1052,7 @@ function! {s:Simpletap.method('stdout_unlike')}(this, Code, regex, ...) "{{{
 endfunction "}}}
 
 function! {s:Simpletap.method('diag')}(this, ...) "{{{
-    call s:stat.add('output_info', [g:simpletap#echohl_diag, '# ' . join(a:000)])
+    call a:this._stat.add('output_info', [g:simpletap#echohl_diag, '# ' . join(a:000)])
 endfunction "}}}
 
 function! {s:Simpletap.method('pass')}(this) "{{{
