@@ -43,11 +43,11 @@ endfunction "}}}
 
 function! s:locked_call(Fn, args, ...) "{{{
     if a:0 == 0
-        StatLock
+        call simpletap#_stat_lock()
         try
             return call(a:Fn, a:args)
         finally
-            StatUnlock
+            call simpletap#_stat_unlock()
         endtry
     else
         let obj = a:1

@@ -121,6 +121,16 @@ function! simpletap#skip(...) "{{{
     return call(s:tap.skip, a:000, s:tap)
 endfunction "}}}
 
+
+
+function! simpletap#_stat_lock() "{{{
+    call s:stat.lock()
+endfunction "}}}
+
+function! simpletap#_stat_unlock() "{{{
+    call s:stat.unlock()
+endfunction "}}}
+
 " }}}
 
 
@@ -390,14 +400,6 @@ function! {s:Runner.method('define_commands')}(this) "{{{
     \   Done
     \   call s:stat.set('done_testing', 1)
 
-    command!
-    \   -bar
-    \   StatLock
-    \   call s:stat.lock()
-    command!
-    \   -bar
-    \   StatUnlock
-    \   call s:stat.unlock()
 
     call s:set_up_variables()
 endfunction "}}}
@@ -421,8 +423,6 @@ function! {s:Runner.method('delete_commands')}(this) "{{{
     delcommand Fail
     delcommand Skip
     delcommand Done
-    delcommand StatLock
-    delcommand StatUnlock
 endfunction "}}}
 
 " }}}
