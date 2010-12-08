@@ -15,6 +15,7 @@ function! s:run() "{{{
         if method ==# 'run'
         \   || method ==# 'run_file'
         \   || method ==# 'run_dir'
+        \   || method ==# 'skip'
             Diag 'skip:', method
             continue
         endif
@@ -30,10 +31,10 @@ function! s:run() "{{{
         \   'like': [1, 1],
         \   'unlike': [1, 1],
         \   'throws_ok': ['throw "error test"', '^error test$'],
-        \   'stdout_is': ["echo 1", 1],
-        \   'stdout_isnt': ["echo 1", 2],
-        \   'stdout_like': ["echo 1", 1],
-        \   'stdout_unlike': ["echo 1", 2],
+        \   'stdout_is': ["echo 1", '1'],
+        \   'stdout_isnt': ["echo 1", '2'],
+        \   'stdout_like': ["echo 1", '1'],
+        \   'stdout_unlike': ["echo 1", '2'],
         \   'pass': [],
         \   'fail': [],
         \   'diag': ['diag test'],
