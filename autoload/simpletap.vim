@@ -6,31 +6,6 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-" TODO
-" - Add command macros.
-" - functions
-"   - plan()
-"   - todo_skip()
-"   - subtest
-"   - eq_array()
-"   - eq_hash()
-"   - eq_set()
-"   - stderr_*()
-"     - I don't know how to implement
-" - More tests for simpletap.
-" - Define global variable or environment variable.
-" - :Is as reference equality test. :Same as current :Is.
-" - Show more detailed messages at s:stat.output_all_summary().
-"   - Need to create s:stat per one script file.
-" - syntax/simpletap-summary.vim
-"
-" The features that I thought that it is needless:
-" - can_ok()
-"   - Use has_key() and ok()
-" - isa_ok()
-" - not_throws_ok()
-"   - Use ok() in :try, not in :catch.
-
 
 " Variables
 let s:runner = {}
