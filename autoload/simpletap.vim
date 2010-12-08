@@ -42,6 +42,8 @@ let s:FAIL = 2
 
 
 
+" Interface {{{
+
 function! simpletap#load() "{{{
     runtime! plugin/simpletap.vim
 endfunction "}}}
@@ -52,181 +54,6 @@ function! simpletap#define_macro() "{{{
     call s:stat.initialize()
 endfunction "}}}
 
-function! s:initialize_once() "{{{
-    call simpletap#load()
-
-    function! s:varname(v) "{{{
-        return 'g:simpletap#' . a:v
-    endfunction "}}}
-    function! s:def(varname, default) "{{{
-        let v = s:varname(a:varname)
-        if !exists(v)
-            let {v} = a:default
-        endif
-    endfunction "}}}
-    function! s:def_hash(varname, default) "{{{
-        let v = s:varname(a:varname)
-        if !exists(v)
-            let {v} = {}
-        endif
-        call extend({v}, a:default, 'keep')
-    endfunction "}}}
-
-    call s:def_hash(
-    \   'pass_fmt',
-    \   {
-    \       'ok': 'ok',
-    \       'cmp_ok': 'ok',
-    \       'is': 'ok',
-    \       'isnt': 'ok',
-    \       'is_deeply': 'ok',
-    \       'like': 'ok',
-    \       'unlike': 'ok',
-    \       'stdout_is': 'ok',
-    \       'stdout_isnt': 'ok',
-    \       'stdout_like': 'ok',
-    \       'stdout_unlike': 'ok',
-    \       'throws_ok': 'ok',
-    \   },
-    \)
-    call s:def_hash(
-    \   'fail_fmt',
-    \   {
-    \       'ok': 'NOT ok',
-    \       'cmp_ok': 'got: %s, expected: %s',
-    \       'is': 'got: %s, expected: %s',
-    \       'isnt': 'got: %s, expected not: %s',
-    \       'is_deeply': 'got: %s, expected: %s',
-    \       'like': 'got: %s, expected like: %s',
-    \       'unlike': 'got: %s, expected like not: %s',
-    \       'stdout_is': 'got: %s, expected: %s',
-    \       'stdout_isnt': 'got: %s, expected: %s',
-    \       'stdout_like': 'got: %s, expected like: %s',
-    \       'stdout_unlike': 'got: %s, expected like not: %s',
-    \       'throws_ok': 'got exception: %s, expected like: %s',
-    \   },
-    \)
-    call s:def('silent', 1)
-    call s:def('echohl_diag', 'Comment')
-    call s:def('echohl_error', 'WarningMsg')
-    call s:def('echohl_begin', 'None')
-    call s:def('echohl_done', 'Underlined')
-    call s:def('echohl_skip', 'Underlined')
-    call s:def('echohl_output', 'None')
-    call s:def('recursive', 1)
-    call s:def('show_only_failed', 1)
-    call s:def('show_exception', 1)
-    call s:def('report', 1)
-    call s:def('output_to', 'buffer')
-
-    delfunc s:varname
-    delfunc s:def
-    delfunc s:def_hash
-
-    call s:set_up_variables()
-endfunction "}}}
-
-
-" Utilities {{{
-
-function! s:warn(msg) "{{{
-    call s:echomsg(g:simpletap#echohl_error, a:msg)
-endfunction "}}}
-
-function! s:warnf(...) "{{{
-    call call('s:warn', [call('printf', a:000)])
-endfunction "}}}
-
-function! s:echomsg(hl, msg) "{{{
-    redraw
-    execute 'echohl' a:hl
-    echomsg a:msg
-    echohl None
-endfunction "}}}
-
-function! s:glob(expr) "{{{
-    return split(glob(a:expr), "\n")
-endfunction "}}}
-
-function! s:error(msg) "{{{
-    return "simpletap:" . a:msg
-endfunction "}}}
-
-function! s:assert(cond, msg) "{{{
-    if !a:cond
-        throw s:error("assertion failure: " . a:msg)
-    endif
-endfunction "}}}
-
-function! s:get_output(Code) "{{{
-    call s:stat.lock()
-
-    redir END
-    redir => output
-
-    try
-        if type(a:Code) == type(function('tr'))
-            let ex = 'call a:Code()'
-        elseif type(a:Code) == type("")
-            let ex = 'execute a:Code'
-        else
-            throw s:error("type error")
-        endif
-        if g:simpletap#silent
-            silent execute ex
-        else
-            execute ex
-        endif
-        redir END
-        return substitute(output, '^\n', '', '')
-    finally
-        redir END
-        call s:stat.unlock()
-    endtry
-endfunction "}}}
-
-function! s:format_to_string(val) "{{{
-    if exists('g:loaded_prettyprint')
-        return PrettyPrint(a:val)
-    else
-        return string(a:val)
-    endif
-endfunction "}}}
-
-
-function! s:equal(l, r) "{{{
-    return type(a:l) == type(a:r)
-    \   && type(a:l) != type({})
-    \   && type(a:l) != type([])
-    \   && type(a:r) != type({})
-    \   && type(a:r) != type([])
-    \   && a:l ==# a:r
-endfunction "}}}
-
-function! s:equal_deeply(l, r) "{{{
-    return type(a:l) == type(a:r)
-    \   && a:l ==# a:r
-endfunction "}}}
-
-function! s:like(Got, regex) "{{{
-    return type(a:Got) == type("")
-    \   && type(a:regex) == type("")
-    \   && a:Got =~# a:regex
-endfunction "}}}
-
-function! s:cmp(l, op, r) "{{{
-    return eval(printf('a:l %s a:r', a:op))
-endfunction "}}}
-
-
-
-function! s:set_up_variables() "{{{
-    let s:runner = s:Runner.new()
-    let s:tap = s:Simpletap.new()
-    let s:stat = s:tap._stat
-endfunction "}}}
-
-" }}}
 
 
 function! simpletap#new(...) "{{{
@@ -234,7 +61,6 @@ function! simpletap#new(...) "{{{
 endfunction "}}}
 
 
-" Autoload {{{
 
 function! simpletap#run(...) "{{{
     return call(s:runner.run, a:000, s:runner)
@@ -325,6 +151,113 @@ endfunction "}}}
 " }}}
 
 
+" Implementation {{{
+
+
+
+" Utilities
+
+function! s:warn(msg) "{{{
+    call s:echomsg(g:simpletap#echohl_error, a:msg)
+endfunction "}}}
+
+function! s:warnf(...) "{{{
+    call call('s:warn', [call('printf', a:000)])
+endfunction "}}}
+
+function! s:echomsg(hl, msg) "{{{
+    redraw
+    execute 'echohl' a:hl
+    echomsg a:msg
+    echohl None
+endfunction "}}}
+
+function! s:glob(expr) "{{{
+    return split(glob(a:expr), "\n")
+endfunction "}}}
+
+function! s:error(msg) "{{{
+    return "simpletap:" . a:msg
+endfunction "}}}
+
+function! s:assert(cond, msg) "{{{
+    if !a:cond
+        throw s:error("assertion failure: " . a:msg)
+    endif
+endfunction "}}}
+
+function! s:get_output(Code) "{{{
+    call s:stat.lock()
+
+    redir END
+    redir => output
+
+    try
+        if type(a:Code) == type(function('tr'))
+            let ex = 'call a:Code()'
+        elseif type(a:Code) == type("")
+            let ex = 'execute a:Code'
+        else
+            throw s:error("type error")
+        endif
+        if g:simpletap#silent
+            silent execute ex
+        else
+            execute ex
+        endif
+        redir END
+        return substitute(output, '^\n', '', '')
+    finally
+        redir END
+        call s:stat.unlock()
+    endtry
+endfunction "}}}
+
+function! s:format_to_string(val) "{{{
+    if exists('g:loaded_prettyprint')
+        return PrettyPrint(a:val)
+    else
+        return string(a:val)
+    endif
+endfunction "}}}
+
+
+
+" Equality check functions
+
+function! s:equal(l, r) "{{{
+    return type(a:l) == type(a:r)
+    \   && type(a:l) != type({})
+    \   && type(a:l) != type([])
+    \   && type(a:r) != type({})
+    \   && type(a:r) != type([])
+    \   && a:l ==# a:r
+endfunction "}}}
+
+function! s:equal_deeply(l, r) "{{{
+    return type(a:l) == type(a:r)
+    \   && a:l ==# a:r
+endfunction "}}}
+
+function! s:like(Got, regex) "{{{
+    return type(a:Got) == type("")
+    \   && type(a:regex) == type("")
+    \   && a:Got =~# a:regex
+endfunction "}}}
+
+function! s:cmp(l, op, r) "{{{
+    return eval(printf('a:l %s a:r', a:op))
+endfunction "}}}
+
+
+" NOTE: This changes s: scope variables.
+function! s:set_up_variables() "{{{
+    let s:runner = s:Runner.new()
+    let s:tap = s:Simpletap.new()
+    let s:stat = s:tap._stat
+endfunction "}}}
+
+
 
 function! s:SID() "{{{
     return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
@@ -404,6 +337,7 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
     endif
 endfunction "}}}
 
+
 function! {s:Runner.method('create_buffer')}(this) "{{{
     new
 
@@ -430,7 +364,6 @@ function! {s:Runner.method('create_buffer')}(this) "{{{
 
     return bufnr('%')
 endfunction "}}}
-
 
 function! {s:Runner.method('define_commands')}(this) "{{{
     " TODO Don't do it yourself
@@ -956,9 +889,84 @@ endfunction "}}}
 
 " }}}
 
+" }}}
 
 
+function! s:initialize_once() "{{{
+    call simpletap#load()
+
+    function! s:varname(v) "{{{
+        return 'g:simpletap#' . a:v
+    endfunction "}}}
+    function! s:def(varname, default) "{{{
+        let v = s:varname(a:varname)
+        if !exists(v)
+            let {v} = a:default
+        endif
+    endfunction "}}}
+    function! s:def_hash(varname, default) "{{{
+        let v = s:varname(a:varname)
+        if !exists(v)
+            let {v} = {}
+        endif
+        call extend({v}, a:default, 'keep')
+    endfunction "}}}
+
+    call s:def_hash(
+    \   'pass_fmt',
+    \   {
+    \       'ok': 'ok',
+    \       'cmp_ok': 'ok',
+    \       'is': 'ok',
+    \       'isnt': 'ok',
+    \       'is_deeply': 'ok',
+    \       'like': 'ok',
+    \       'unlike': 'ok',
+    \       'stdout_is': 'ok',
+    \       'stdout_isnt': 'ok',
+    \       'stdout_like': 'ok',
+    \       'stdout_unlike': 'ok',
+    \       'throws_ok': 'ok',
+    \   },
+    \)
+    call s:def_hash(
+    \   'fail_fmt',
+    \   {
+    \       'ok': 'NOT ok',
+    \       'cmp_ok': 'got: %s, expected: %s',
+    \       'is': 'got: %s, expected: %s',
+    \       'isnt': 'got: %s, expected not: %s',
+    \       'is_deeply': 'got: %s, expected: %s',
+    \       'like': 'got: %s, expected like: %s',
+    \       'unlike': 'got: %s, expected like not: %s',
+    \       'stdout_is': 'got: %s, expected: %s',
+    \       'stdout_isnt': 'got: %s, expected: %s',
+    \       'stdout_like': 'got: %s, expected like: %s',
+    \       'stdout_unlike': 'got: %s, expected like not: %s',
+    \       'throws_ok': 'got exception: %s, expected like: %s',
+    \   },
+    \)
+    call s:def('silent', 1)
+    call s:def('echohl_diag', 'Comment')
+    call s:def('echohl_error', 'WarningMsg')
+    call s:def('echohl_begin', 'None')
+    call s:def('echohl_done', 'Underlined')
+    call s:def('echohl_skip', 'Underlined')
+    call s:def('echohl_output', 'None')
+    call s:def('recursive', 1)
+    call s:def('show_only_failed', 1)
+    call s:def('show_exception', 1)
+    call s:def('report', 1)
+    call s:def('output_to', 'buffer')
+
+    delfunc s:varname
+    delfunc s:def
+    delfunc s:def_hash
+
+    call s:set_up_variables()
+endfunction "}}}
 call s:initialize_once()
+
 
 " Restore 'cpoptions' {{{
 let &cpo = s:save_cpo
