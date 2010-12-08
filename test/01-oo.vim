@@ -6,33 +6,6 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-function! s:get_args(method) "{{{
-    let args = {
-    \   'ok': [1],
-    \   'cmp_ok': [1, '==', 1],
-    \   'is': [1, 1],
-    \   'isnt': [1, 1],
-    \   'is_deeply': [1, 1],
-    \   'like': [1, 1],
-    \   'unlike': [1, 1],
-    \   'throws_ok': ['throw "error test"', '^error test$'],
-    \   'stdout_is': ["echo 1", 1],
-    \   'stdout_isnt': ["echo 1", 2],
-    \   'stdout_like': ["echo 1", 1],
-    \   'stdout_unlike': ["echo 1", 2],
-    \   'pass': [],
-    \   'fail': [],
-    \   'diag': ['diag test'],
-    \}
-
-    if has_key(args, a:method)
-        return args[a:method]
-    elseif a:method ==# 'run'
-        throw 'skip'
-    else
-        throw 'no args'
-    endif
-endfunction "}}}
 
 function! s:run() "{{{
     let o = simpletap#new()
@@ -40,16 +13,38 @@ function! s:run() "{{{
     Diag 'It should be the same results of OO way and function way'
 
     for method in sort(keys(filter(copy(o), 'type(v:val) == type(function("tr"))')))
-        try
-            let args = s:get_args(method)
-        catch /^no args$/
-            Diag 'no args:', method
-            call simpletap#fail()
-            continue
-        catch /^skip$/
+        " Skip some methods.
+        if method ==# 'run'
+        \   || method ==# 'run_file'
+        \   || method ==# 'run_dir'
             Diag 'skip:', method
             continue
-        endtry
+        endif
+
+        " Get the methods' arguments for the test.
+        let not_found = []
+        let args = get({
+        \   'ok': [1],
+        \   'cmp_ok': [1, '==', 1],
+        \   'is': [1, 1],
+        \   'isnt': [1, 1],
+        \   'is_deeply': [1, 1],
+        \   'like': [1, 1],
+        \   'unlike': [1, 1],
+        \   'throws_ok': ['throw "error test"', '^error test$'],
+        \   'stdout_is': ["echo 1", 1],
+        \   'stdout_isnt': ["echo 1", 2],
+        \   'stdout_like': ["echo 1", 1],
+        \   'stdout_unlike': ["echo 1", 2],
+        \   'pass': [],
+        \   'fail': [],
+        \   'diag': ['diag test'],
+        \}, method, not_found)
+        if args is not_found
+            Diag "unknown method: " . method
+            call simpletap#fail()
+            continue
+        endif
 
         " Methods using :redir cannot be tested.
         " Because these tests use :redir .
