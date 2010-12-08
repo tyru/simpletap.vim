@@ -1047,6 +1047,10 @@ function! {s:Simpletap.method('stdout_unlike')}(this, Code, regex, ...) "{{{
     endif
 endfunction "}}}
 
+function! {s:Simpletap.method('diag')}(this, ...) "{{{
+    call s:stat.add('output_info', [g:simpletap#echohl_diag, '# ' . join(a:000)])
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
