@@ -331,17 +331,6 @@ function! s:end_test_once() "{{{
     delcommand StatUnlock
 endfunction "}}}
 
-function! s:output(bufnr, lines) "{{{
-    if a:bufnr ==# -1
-        for [hl, msg] in a:lines
-            call s:echomsg(hl, msg)
-        endfor
-    else
-        call s:assert(a:bufnr ==# bufnr('%'), 's:output(): a:bufnr is current buffer')
-        call setline(line('$'), map(copy(a:lines), 'v:val[1]'))
-    endif
-endfunction "}}}
-
 function! s:create_buffer() "{{{
     new
     
@@ -929,12 +918,23 @@ function! {s:Stat.method('source')}(this, file) "{{{
     endtry
 endfunction "}}}
 
+function! {s:Stat.method('output')}(this, bufnr, lines) "{{{
+    if a:bufnr ==# -1
+        for [hl, msg] in a:lines
+            call s:echomsg(hl, msg)
+        endfor
+    else
+        call s:assert(a:bufnr ==# bufnr('%'), 's:Stat.output(): a:bufnr is current buffer')
+        call setline(line('$'), map(copy(a:lines), 'v:val[1]'))
+    endif
+endfunction "}}}
+
 function! {s:Stat.method('output_summary')}(this, bufnr) "{{{
     let results = copy(a:this.get('test_result'))
     let failed = !empty(filter(results, 'v:val ==# s:FAIL'))
     let output_info = a:this.get('output_info')
     if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
-        call s:output(a:bufnr, output_info)
+        call a:this.output(a:bufnr, output_info)
     endif
 endfunction "}}}
 
@@ -951,7 +951,7 @@ function! {s:Stat.method('output_all_summary')}(this, bufnr, pass_all) "{{{
         return
     endif
 
-    call s:output(a:bufnr, lines)
+    call a:this.output(a:bufnr, lines)
 endfunction "}}}
 
 " }}}
