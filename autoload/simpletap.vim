@@ -308,29 +308,6 @@ function! s:begin_test_once() "{{{
     call s:set_up_variables()
 endfunction "}}}
 
-function! s:end_test_once() "{{{
-    delcommand OK
-    delcommand Ok
-    delcommand Is
-    delcommand Isnt
-    delcommand IsDeeply
-    delcommand Like
-    delcommand Unlike
-    delcommand ThrowsOK
-    delcommand ThrowsOk
-    delcommand StdoutIs
-    delcommand StdoutIsnt
-    delcommand StdoutLike
-    delcommand StdoutUnlike
-    delcommand Diag
-    delcommand Pass
-    delcommand Fail
-    delcommand Skip
-    delcommand Done
-    delcommand StatLock
-    delcommand StatUnlock
-endfunction "}}}
-
 
 function! s:set_up_variables() "{{{
     let s:runner = s:Runner.new()
@@ -478,7 +455,7 @@ function! {s:Runner.method('run_file')}(this, file) "{{{
     call s:begin_test_once()
     let passed = s:stat.source(file)
     call s:stat.output_summary(output_bufnr)
-    call s:end_test_once()
+    call a:this.delete_commands()
     call s:stat.output_all_summary(output_bufnr, passed)
 
     if g:simpletap#report && output_bufnr ==# -1
@@ -508,7 +485,7 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
         endif
         call s:stat.output_summary(output_bufnr)
     endfor
-    call s:end_test_once()
+    call a:this.delete_commands()
     call s:stat.output_all_summary(output_bufnr, pass_all)
 
     if g:simpletap#report && output_bufnr ==# -1
@@ -541,6 +518,29 @@ function! {s:Runner.method('create_buffer')}(this) "{{{
     highlight def link simpletapMessage Comment
 
     return bufnr('%')
+endfunction "}}}
+
+function! {s:Runner.method('delete_commands')}(this) "{{{
+    delcommand OK
+    delcommand Ok
+    delcommand Is
+    delcommand Isnt
+    delcommand IsDeeply
+    delcommand Like
+    delcommand Unlike
+    delcommand ThrowsOK
+    delcommand ThrowsOk
+    delcommand StdoutIs
+    delcommand StdoutIsnt
+    delcommand StdoutLike
+    delcommand StdoutUnlike
+    delcommand Diag
+    delcommand Pass
+    delcommand Fail
+    delcommand Skip
+    delcommand Done
+    delcommand StatLock
+    delcommand StatUnlock
 endfunction "}}}
 
 " }}}
