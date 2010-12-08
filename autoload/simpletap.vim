@@ -957,6 +957,16 @@ function! {s:Simpletap.method('isnt')}(this, Got, Expected, ...) "{{{
     endif
 endfunction "}}}
 
+function! {s:Simpletap.method('is_deeply')}(this, Got, Expected, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    if s:equal_deeply(a:Got, a:Expected)
+        return s:passed(testname, 'is_deeply')
+    else
+        return s:failed(testname, 'is_deeply', a:Got, a:Expected)
+    endif
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
