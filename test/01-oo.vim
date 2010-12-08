@@ -24,19 +24,14 @@ func! s:get_args(method) "{{{
     \   'fail': [],
     \   'diag': ['diag test'],
     \}
-    let skip = ['run']
 
     if has_key(args, a:method)
         return args[a:method]
-    elseif s:list_has(skip, a:method)
+    elseif a:method ==# 'run'
         throw 'skip'
     else
         throw 'no args'
     endif
-endfunc "}}}
-
-func! s:list_has(list, elem) "{{{
-    return !empty(filter(copy(a:list), 'v:val ==# a:elem'))
 endfunc "}}}
 
 func! s:run() "{{{
@@ -56,8 +51,13 @@ func! s:run() "{{{
             continue
         endtry
 
+        " methods using :redir cannot be tested
+        " because these tests use :redir
         " TODO Stackable :redir
-        if s:list_has(['stdout_is', 'stdout_isnt', 'stdout_like', 'stdout_unlike'], method)
+        if method ==# 'stdout_is'
+        \ || method ==# 'stdout_isnt'
+        \ || method ==# 'stdout_like'
+        \ || method ==# 'stdout_unlike'
             let got = simpletap#util#locked_call_silent(o[method], args, o)
             let expected = simpletap#util#locked_call_silent('simpletap#' . method, args)
 
