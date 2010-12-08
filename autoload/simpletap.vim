@@ -852,7 +852,7 @@ let s:Simpletap = vice#class(
 \)
 
 function! {s:Simpletap.constructor()}(this) "{{{
-    let a:this._stat = s:test_vars_new()
+    let a:this._stat = s:Stat.new()
 endfunction "}}}
 
 
