@@ -6,9 +6,6 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-" Functions {{{
-
-" TODO OO interface
 
 
 function! simpletap#test#really_exists_func(Fn, ...) "{{{
@@ -32,6 +29,24 @@ function! simpletap#test#really_exists_func(Fn, ...) "{{{
     endtry
 endfunction "}}}
 
+function! simpletap#test#get_local_func(pat, funcname) "{{{
+    redir => out
+    silent scriptnames
+    redir END
+
+    for line in split(out, '\n')
+        let sid = matchstr(line, '^\s*\zs\d\+\ze:'.'\C')
+        if line =~# a:pat && sid != ''
+            return printf('<SNR>%d_%s', sid, a:funcname)
+        endif
+    endfor
+
+    return ''
+endfunction "}}}
+
+
+
+" for the test of simpletap itself.
 
 function! simpletap#test#locked_call(...) "{{{
     return call('s:locked_call', a:000)
@@ -61,22 +76,6 @@ function! s:locked_call(Fn, args, ...) "{{{
 endfunction "}}}
 
 
-function! simpletap#test#get_local_func(pat, funcname) "{{{
-    redir => out
-    silent scriptnames
-    redir END
-
-    for line in split(out, '\n')
-        let sid = matchstr(line, '^\s*\zs\d\+\ze:'.'\C')
-        if line =~# a:pat && sid != ''
-            return printf('<SNR>%d_%s', sid, a:funcname)
-        endif
-    endfor
-
-    return ''
-endfunction "}}}
-
-" }}}
 
 " Restore 'cpoptions' {{{
 let &cpo = s:save_cpo
