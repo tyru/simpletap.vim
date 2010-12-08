@@ -37,7 +37,7 @@ endfunction "}}}
 function! s:run() "{{{
     let o = simpletap#new()
 
-    Diag 'OO way and function way result in same result.'
+    Diag 'It should be the same results of OO way and function way'
 
     for method in sort(keys(filter(copy(o), 'type(v:val) == type(function("tr"))')))
         try
