@@ -24,7 +24,7 @@ set cpo&vim
 "   - Need to create s:stat per one script file.
 " - syntax/simpletap-summary.vim
 "
-" Needless:
+" The features that I thought that it is needless:
 " - can_ok()
 "   - Use has_key() and ok()
 " - isa_ok()
