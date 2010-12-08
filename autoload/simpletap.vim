@@ -877,7 +877,11 @@ endfunction "}}}
 
 " }}}
 " s:Stat {{{
-let s:Stat = vice#class('Stat', s:SID_PREFIX, {'generate_stub': 1})
+let s:Stat = vice#class(
+\   'Stat',
+\   s:SID_PREFIX,
+\   {'generate_stub': 1}
+\)
 
 function! {s:Stat.constructor()}(this) "{{{
     let a:this.vars = {
