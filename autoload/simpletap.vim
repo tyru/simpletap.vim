@@ -926,6 +926,17 @@ function! {s:Simpletap.method('ok')}(this, cond, ...) "{{{
     endif
 endfunction "}}}
 
+function! {s:Simpletap.method('cmp_ok')}(this, Got, op, Expected, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    if s:cmp(a:Got, a:op, a:Expected)
+        return s:passed(testname, 'cmp_ok')
+    else
+        " TODO Output a:op.
+        return s:failed(testname, 'cmp_ok', a:Got, a:Expected)
+    endif
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
