@@ -1148,6 +1148,27 @@ function! {s:Stat.method('get_output')}(this, Code) "{{{
     endtry
 endfunction "}}}
 
+function! {s:Stat.method('passed')}(this, testname, funcname) "{{{
+    call a:this.add(
+    \   'output_info',
+    \   [
+    \       g:simpletap#echohl_output,
+    \       printf(
+    \          '%d. %s ... %s',
+    \          a:this.get('current_test_num'),
+    \          a:testname,
+    \          g:simpletap#pass_fmt[a:funcname]
+    \       )
+    \   ]
+    \)
+
+    call a:this.add('test_result', s:PASS)
+
+    call s:step_num()
+
+    return 1
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
