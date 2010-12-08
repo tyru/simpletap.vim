@@ -1121,6 +1121,7 @@ function! {s:Stat.method('unlock')}(this) "{{{
     let a:this.is_locked = 0
 endfunction "}}}
 
+
 function! {s:Stat.method('get_output')}(this, Code) "{{{
     call a:this.lock()
 
