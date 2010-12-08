@@ -46,37 +46,6 @@ endfunction "}}}
 
 
 
-" for the test of simpletap itself.
-
-function! simpletap#test#locked_call(...) "{{{
-    return call('s:locked_call', a:000)
-endfunction "}}}
-
-function! simpletap#test#locked_call_silent(...) "{{{
-    silent return call('s:locked_call', a:000)
-endfunction "}}}
-
-function! s:locked_call(Fn, args, ...) "{{{
-    if a:0 == 0
-        call simpletap#_stat_lock()
-        try
-            return call(a:Fn, a:args)
-        finally
-            call simpletap#_stat_unlock()
-        endtry
-    else
-        let obj = a:1
-        call obj._stat.lock()
-        try
-            return call(a:Fn, a:args, obj)
-        finally
-            call obj._stat.unlock()
-        endtry
-    endif
-endfunction "}}}
-
-
-
 " Restore 'cpoptions' {{{
 let &cpo = s:save_cpo
 " }}}

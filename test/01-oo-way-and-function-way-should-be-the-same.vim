@@ -7,6 +7,25 @@ set cpo&vim
 " }}}
 
 
+function! s:locked_call(Fn, args, ...) "{{{
+    if a:0 == 0
+        call simpletap#_stat_lock()
+        try
+            return call(a:Fn, a:args)
+        finally
+            call simpletap#_stat_unlock()
+        endtry
+    else
+        let obj = a:1
+        call obj._stat.lock()
+        try
+            return call(a:Fn, a:args, obj)
+        finally
+            call obj._stat.unlock()
+        endtry
+    endif
+endfunction "}}}
+
 function! s:run() "{{{
     let o = simpletap#new()
 
@@ -52,16 +71,16 @@ function! s:run() "{{{
         \ || method ==# 'stdout_isnt'
         \ || method ==# 'stdout_like'
         \ || method ==# 'stdout_unlike'
-            let got = simpletap#util#locked_call_silent(o[method], args, o)
-            let expected = simpletap#util#locked_call_silent('simpletap#' . method, args)
+            silent let got = s:locked_call(o[method], args, o)
+            silent let expected = s:locked_call('simpletap#' . method, args)
 
             Is got, expected, method
         else
             redir => got_output
-                let got = simpletap#util#locked_call_silent(o[method], args, o)
+                silent let got = s:locked_call(o[method], args, o)
             redir END
             redir => expected_output
-                let expected = simpletap#util#locked_call_silent('simpletap#' . method, args)
+                silent let expected = s:locked_call('simpletap#' . method, args)
             redir END
 
             Is got, expected, method
