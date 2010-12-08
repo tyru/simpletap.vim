@@ -855,6 +855,19 @@ function! {s:Simpletap.constructor()}(this) "{{{
     let a:this._stat = s:test_vars_new()
 endfunction "}}}
 
+
+function! {s:Simpletap.method('run')}(this, path) "{{{
+    if getftype(a:path) == ''
+        return
+    endif
+    if isdirectory(a:path)
+        call simpletap#run_dir(a:path)
+    else
+        call simpletap#run_file(a:path)
+    endif
+endfunction "}}}
+
+
 function! {s:Simpletap.method('ok')}(this, cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
