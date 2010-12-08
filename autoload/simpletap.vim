@@ -1066,6 +1066,62 @@ function! {s:Simpletap.method('skip')}(this) "{{{
 endfunction "}}}
 
 " }}}
+" s:Stat {{{
+let s:Stat = vice#class('Stat', s:SID_PREFIX, {'generate_stub': 1})
+
+function! {s:Stat.constructor()}(this) "{{{
+    let a:this.vars = {
+    \   'current_test_num': 1,
+    \   'done_testing': 0,
+    \   'test_result': [],
+    \   'output_info': [],
+    \   'finalizer': {},
+    \}
+    let a:this.is_locked = 0
+endfunction "}}}
+
+function! {s:Stat.method('initialize')}(this) "{{{
+    for [key, val] in items(s:Stat.new().vars)
+        call a:this.set(key, val)
+        unlet val
+    endfor
+endfunction "}}}
+
+function! {s:Stat.method('get')}(this, varname) "{{{
+    return a:this.vars[a:varname]
+endfunction "}}}
+
+function! {s:Stat.method('set')}(this, varname, value) "{{{
+    if a:this.is_locked | return | endif
+
+    let a:this.vars[a:varname] = a:value
+endfunction "}}}
+
+function! {s:Stat.method('increment')}(this, varname) "{{{
+    if a:this.is_locked | return | endif
+
+    let val = a:this.get(a:varname)
+    call s:assert(type(val) == type(0), 'type(val) is Number')
+    call a:this.set(a:varname, val + 1)
+endfunction "}}}
+
+function! {s:Stat.method('add')}(this, varname, value) "{{{
+    if a:this.is_locked | return | endif
+
+    let list = a:this.get(a:varname)
+    call s:assert(type(list) == type([]), 'type(list) is List')
+    call a:this.set(a:varname, add(list, a:value))
+endfunction "}}}
+
+function! {s:Stat.method('lock')}(this) "{{{
+    let a:this.is_locked = 1
+endfunction "}}}
+
+function! {s:Stat.method('unlock')}(this) "{{{
+    let a:this.is_locked = 0
+endfunction "}}}
+
+" }}}
 
 call s:initialize_once()
 
