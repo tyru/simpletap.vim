@@ -902,6 +902,32 @@ endfunction "}}}
 
 " }}}
 
+
+function! s:SID() "{{{
+    return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
+endfunction "}}}
+let s:SID_PREFIX = s:SID()
+delfunc s:SID
+
+" s:Simpletap {{{
+let s:Simpletap = vice#class(
+\   'Simpletap',
+\   s:SID_PREFIX,
+\   {'generate_stub': 1}
+\)
+
+function! {s:Simpletap.method('ok')}(this, cond, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    if a:cond
+        return s:passed(testname, 'ok')
+    else
+        return s:failed(testname, 'ok')
+    endif
+endfunction "}}}
+
+" }}}
+
 call s:initialize_once()
 
 " Restore 'cpoptions' {{{
