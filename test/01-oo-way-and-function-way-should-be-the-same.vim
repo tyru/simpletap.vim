@@ -10,8 +10,6 @@ set cpo&vim
 function! s:run() "{{{
     let o = simpletap#new()
 
-    Diag 'It should be the same results of OO way and function way'
-
     for method in sort(keys(filter(copy(o), 'type(v:val) == type(function("tr"))')))
         " Skip some methods.
         if method ==# 'run'
