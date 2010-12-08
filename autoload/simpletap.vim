@@ -186,7 +186,10 @@ function! s:assert(cond, msg) "{{{
 endfunction "}}}
 
 function! s:format_to_string(val) "{{{
-    if exists('g:loaded_prettyprint')
+    " If installed prettyprint.vim:
+    "   https://github.com/thinca/vim-prettyprint
+
+    if exists('*PrettyPrint')
         return PrettyPrint(a:val)
     else
         return string(a:val)
