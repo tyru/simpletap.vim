@@ -122,8 +122,7 @@ function! s:initialize_once() "{{{
     delfunc s:def
     delfunc s:def_hash
 
-    let s:tap = s:Simpletap.new()
-    let s:stat = s:tap._stat
+    call s:set_up_variables()
 endfunction "}}}
 
 
@@ -373,8 +372,7 @@ function! s:begin_test_once() "{{{
     \   StatUnlock
     \   call s:stat.unlock()
 
-    let s:tap = s:Simpletap.new()
-    let s:stat = s:tap._stat
+    call s:set_up_variables()
 endfunction "}}}
 
 function! s:begin_test(file) "{{{
@@ -525,6 +523,12 @@ function! s:create_buffer() "{{{
     highlight def link simpletapMessage Comment
     
     return bufnr('%')
+endfunction "}}}
+
+
+function! s:set_up_variables() "{{{
+    let s:tap = s:Simpletap.new()
+    let s:stat = s:tap._stat
 endfunction "}}}
 
 " }}}
