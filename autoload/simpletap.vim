@@ -20,7 +20,7 @@ set cpo&vim
 " - More tests for simpletap.
 " - Define global variable or environment variable.
 " - :Is as reference equality test. :Same as current :Is.
-" - Show more detailed messages at s:output_all_summary().
+" - Show more detailed messages at s:stat.output_all_summary().
 "   - Need to create s:stat per one script file.
 " - syntax/simpletap-summary.vim
 "
@@ -342,22 +342,6 @@ function! s:output(bufnr, lines) "{{{
     endif
 endfunction "}}}
 
-function! s:output_all_summary(bufnr, pass_all) "{{{
-    let lines = []
-
-    if a:pass_all
-        call add(lines, ['None', ''])
-        call add(lines, [g:simpletap#echohl_done, 'All test(s) passed.'])
-    elseif empty(s:stat.get('test_result'))
-        call add(lines, ['None', ''])
-        call add(lines, [g:simpletap#echohl_error, 'no tests to run.'])
-    else
-        return
-    endif
-
-    call s:output(a:bufnr, lines)
-endfunction "}}}
-
 function! s:create_buffer() "{{{
     new
     
@@ -533,7 +517,7 @@ function! {s:Runner.method('run_file')}(this, file) "{{{
     let passed = s:stat.source(file)
     call s:stat.output_summary(output_bufnr)
     call s:end_test_once()
-    call s:output_all_summary(output_bufnr, passed)
+    call s:stat.output_all_summary(output_bufnr, passed)
 
     if g:simpletap#report && output_bufnr ==# -1
         messages
@@ -563,7 +547,7 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
         call s:stat.output_summary(output_bufnr)
     endfor
     call s:end_test_once()
-    call s:output_all_summary(output_bufnr, pass_all)
+    call s:stat.output_all_summary(output_bufnr, pass_all)
 
     if g:simpletap#report && output_bufnr ==# -1
         messages
