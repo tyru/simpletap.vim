@@ -51,11 +51,11 @@ function! s:locked_call(Fn, args, ...) "{{{
         endtry
     else
         let obj = a:1
-        call obj.stat.lock()
+        call obj._stat.lock()
         try
             return call(a:Fn, a:args, obj)
         finally
-            call obj.stat.unlock()
+            call obj._stat.unlock()
         endtry
     endif
 endfunction "}}}

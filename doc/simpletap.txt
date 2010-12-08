@@ -34,6 +34,33 @@ COMMANDS					*simpletap-commands* {{{
 }}}
 ==============================================================================
 TODO						*simpletap-todo* {{{
+
+- functions
+  - plan()
+  - todo_skip()
+  - subtest
+  - eq_array()
+  - eq_hash()
+  - eq_set()
+- More tests for simpletap.
+- :Is as reference equality test. :Same as current :Is.
+  - reference equality
+  - value equality
+  - structure equality
+- Show more detailed messages at s:stat.output_all_summary().
+  - Need to create s:stat per one script file.
+- do not show passed tests. ()
+- syntax/simpletap-summary.vim
+
+
+The features that I thought that it is needless
+(but other languages' TAP bindings have):
+- can_ok()
+  - Use has_key() and ok()
+- isa_ok()
+- not_throws_ok()
+  - Use ok() in :try, not in :catch.
+
 }}}
 ==============================================================================
 CHANGELOG						*simpletap-changelog* {{{
