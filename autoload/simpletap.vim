@@ -867,6 +867,30 @@ function! {s:Simpletap.method('run')}(this, path) "{{{
     endif
 endfunction "}}}
 
+function! {s:Simpletap.method('run_file')}(this, file) "{{{
+    let file = expand(a:file)
+    if !filereadable(file)
+        call s:warnf("'%s' is not file.", file)
+        return
+    endif
+
+    " Create buffer if needed.
+    let output_bufnr = -1
+    if g:simpletap#output_to ==# 'buffer'
+        let output_bufnr = s:create_buffer()
+    endif
+
+    call s:begin_test_once()
+    let passed = s:source(file)
+    call s:output_summary(output_bufnr)
+    call s:end_test_once()
+    call s:output_all_summary(output_bufnr, passed)
+
+    if g:simpletap#report && output_bufnr ==# -1
+        messages
+    endif
+endfunction "}}}
+
 
 function! {s:Simpletap.method('ok')}(this, cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
