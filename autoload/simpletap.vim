@@ -1290,6 +1290,22 @@ function! {s:Stat.method('output_summary')}(this, bufnr) "{{{
     endif
 endfunction "}}}
 
+function! {s:Stat.method('output_all_summary')}(this, bufnr, pass_all) "{{{
+    let lines = []
+
+    if a:pass_all
+        call add(lines, ['None', ''])
+        call add(lines, [g:simpletap#echohl_done, 'All test(s) passed.'])
+    elseif empty(a:this.get('test_result'))
+        call add(lines, ['None', ''])
+        call add(lines, [g:simpletap#echohl_error, 'no tests to run.'])
+    else
+        return
+    endif
+
+    call s:output(a:bufnr, lines)
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
