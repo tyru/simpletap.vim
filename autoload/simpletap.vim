@@ -1212,6 +1212,10 @@ function! {s:Stat.method('failed')}(this, testname, funcname, ...) "{{{
     return 0
 endfunction "}}}
 
+function! {s:Stat.method('step_num')}(this) "{{{
+    call a:this.increment('current_test_num')
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
