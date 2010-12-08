@@ -331,34 +331,16 @@ function! s:end_test_once() "{{{
     delcommand StatUnlock
 endfunction "}}}
 
-function! s:end_test(file, skipped) "{{{
-    let test_result = s:stat.get('test_result')
-    let failed_result_num = len(filter(copy(test_result), 'v:val ==# s:FAIL'))
-    let passed_result_num = len(test_result) - failed_result_num
-
-    if a:skipped
-        call s:stat.add('output_info', [g:simpletap#echohl_skip, 'Skip.'])
-    elseif !s:stat.get('done_testing')
-        call s:warnf("test '%s' has not done properly.", a:file)
-    elseif empty(test_result)
-        call s:warnf("test '%s' has done but no tests performed.", a:file)
-    else
-        let hl = (failed_result_num ? g:simpletap#echohl_error : g:simpletap#echohl_done)
-        let msg = printf('Done %d test(s). (PASS:%d, FAIL:%d)', passed_result_num + failed_result_num, passed_result_num, failed_result_num)
-        call s:stat.add('output_info', [hl, msg])
-    endif
-endfunction "}}}
-
 function! s:source(file) "{{{
     call s:stat.begin_test(a:file)
     try
         source `=a:file`
-        call s:end_test(a:file, 0)
+        call s:stat.end_test(a:file, 0)
         let results = s:stat.get('test_result')
         let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
         return failed ? 0 : 1
     catch /^simpletap - SKIP$/
-        call s:end_test(a:file, 1)
+        call s:stat.end_test(a:file, 1)
         return 1
     catch
         for msg in [
@@ -976,12 +958,12 @@ function! {s:Stat.method('source')}(this, file) "{{{
     call a:this.begin_test(a:file)
     try
         source `=a:file`
-        call s:end_test(a:file, 0)
+        call a:this.end_test(a:file, 0)
         let results = a:this.get('test_result')
         let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
         return failed ? 0 : 1
     catch /^simpletap - SKIP$/
-        call s:end_test(a:file, 1)
+        call a:this.end_test(a:file, 1)
         return 1
     catch
         for msg in [
