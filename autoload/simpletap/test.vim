@@ -11,7 +11,7 @@ set cpo&vim
 " TODO OO interface
 
 
-function! simpletap#util#really_exists_func(Fn, ...) "{{{
+function! simpletap#test#really_exists_func(Fn, ...) "{{{
     let args = a:0 != 0 ? a:1 : []
 
     try
@@ -33,11 +33,11 @@ function! simpletap#util#really_exists_func(Fn, ...) "{{{
 endfunction "}}}
 
 
-function! simpletap#util#locked_call(...) "{{{
+function! simpletap#test#locked_call(...) "{{{
     return call('s:locked_call', a:000)
 endfunction "}}}
 
-function! simpletap#util#locked_call_silent(...) "{{{
+function! simpletap#test#locked_call_silent(...) "{{{
     silent return call('s:locked_call', a:000)
 endfunction "}}}
 
@@ -61,7 +61,7 @@ function! s:locked_call(Fn, args, ...) "{{{
 endfunction "}}}
 
 
-function! simpletap#util#get_local_func(pat, funcname) "{{{
+function! simpletap#test#get_local_func(pat, funcname) "{{{
     redir => out
     silent scriptnames
     redir END
