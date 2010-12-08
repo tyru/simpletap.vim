@@ -1036,6 +1036,17 @@ function! {s:Simpletap.method('stdout_like')}(this, Code, regex, ...) "{{{
     endif
 endfunction "}}}
 
+function! {s:Simpletap.method('stdout_unlike')}(this, Code, regex, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    let output = s:get_output(a:Code)
+    if !s:like(output, a:regex)
+        return s:passed(testname, 'stdout_unlike')
+    else
+        return s:failed(testname, 'stdout_unlike', output, a:regex)
+    endif
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
