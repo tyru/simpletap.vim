@@ -33,6 +33,7 @@ set cpo&vim
 
 
 " Variables
+let s:tap = {}
 let s:stat = {}
 
 let s:PASS = 1
@@ -61,8 +62,6 @@ function! s:initialize_once() "{{{
         if !exists(v)
             let {v} = a:default
         endif
-
-        let s:simpletap[a:varname] = deepcopy({v})
     endfunction "}}}
     function! s:def_hash(varname, default) "{{{
         let v = s:varname(a:varname)
@@ -70,8 +69,6 @@ function! s:initialize_once() "{{{
             let {v} = {}
         endif
         call extend({v}, a:default, 'keep')
-
-        let s:simpletap[a:varname] = deepcopy({v})
     endfunction "}}}
 
     call s:def_hash(
@@ -125,6 +122,8 @@ function! s:initialize_once() "{{{
     delfunc s:def
     delfunc s:def_hash
 
+    let s:tap = s:Simpletap.new()
+    let s:stat = s:tap._stat
 endfunction "}}}
 
 
@@ -374,7 +373,8 @@ function! s:begin_test_once() "{{{
     \   StatUnlock
     \   call s:stat.unlock()
 
-    let s:stat = s:Stat.new()
+    let s:tap = s:Simpletap.new()
+    let s:stat = s:tap._stat
 endfunction "}}}
 
 function! s:begin_test(file) "{{{
@@ -530,308 +530,102 @@ endfunction "}}}
 " }}}
 
 
-" OO interface {{{
-let s:simpletap = {}    " See defintions at s:initialize_once().
-
 function! simpletap#new(...) "{{{
-    let obj = deepcopy(s:simpletap)
-
-    let obj.save_prop = a:0 != 0 ? a:1 : {}
-
-    let obj.stat = deepcopy(s:stat)
-
-    return obj
+    return s:Simpletap.new()
 endfunction "}}}
 
-function! s:add_method(name) "{{{
-    if has_key(s:simpletap, a:name)
-        return
-    endif
-
-    let template = [
-    \   'function! s:simpletap.%s(...) dict',
-    \       'let saved = empty(self.save_prop) ? {} : s:get_current_global_vars()',
-    \       'call s:set_global_vars(self.save_prop)',
-    \       'let saved_stat = s:stat',
-    \       'let s:stat = self.stat',
-    \       'try',
-    \           'return call("simpletap#%s", a:000)',
-    \       'finally',
-    \           'call s:set_global_vars(saved)',
-    \           'let s:stat = saved_stat',
-    \       'endtry',
-    \   'endfunction',
-    \]
-    execute printf(join(template, "\n"), a:name, a:name)
-endfunction "}}}
-
-function! s:get_global_varnames() "{{{
-    return keys(filter(copy(s:simpletap), 'type(v:val) != type(function("tr"))'))
-endfunction "}}}
-
-function! s:get_current_global_vars() "{{{
-    let ret = {}
-    for var in s:get_global_varnames()
-        let ret[var] = deepcopy(g:simpletap#{var})
-    endfor
-    return ret
-endfunction "}}}
-
-function! s:set_global_vars(prop) "{{{
-    for var in keys(a:prop)
-        let g:simpletap#{var} = deepcopy(a:prop[var])
-    endfor
-endfunction "}}}
-
-" }}}
 
 " Autoload {{{
 
-function! simpletap#finalizer() "{{{
-    return s:stat.get('finalizer')
+function! simpletap#finalizer(...) "{{{
+    return call(s:tap.finalizer, a:000, s:tap)
 endfunction "}}}
 
 
-function! simpletap#run(path) "{{{
-    if getftype(a:path) == ''
-        return
-    endif
-    if isdirectory(a:path)
-        call simpletap#run_dir(a:path)
-    else
-        call simpletap#run_file(a:path)
-    endif
+function! simpletap#run(...) "{{{
+    return call(s:tap.run, a:000, s:tap)
 endfunction "}}}
 
-function! simpletap#run_file(file) "{{{
-    let file = expand(a:file)
-    if !filereadable(file)
-        call s:warnf("'%s' is not file.", file)
-        return
-    endif
-
-    " Create buffer if needed.
-    let output_bufnr = -1
-    if g:simpletap#output_to ==# 'buffer'
-        let output_bufnr = s:create_buffer()
-    endif
-
-    call s:begin_test_once()
-    let passed = s:source(file)
-    call s:output_summary(output_bufnr)
-    call s:end_test_once()
-    call s:output_all_summary(output_bufnr, passed)
-
-    if g:simpletap#report && output_bufnr ==# -1
-        messages
-    endif
+function! simpletap#run_file(...) "{{{
+    return call(s:tap.run_file, a:000, s:tap)
 endfunction "}}}
-call s:add_method('run_file')
 
-function! simpletap#run_dir(dir) "{{{
-    let dir = expand(a:dir)
-    if !isdirectory(dir)
-        call s:warnf("'%s' is not directory.", dir)
-        return
-    endif
-    let pat = dir . '/' . (g:simpletap#recursive ? '**/*.vim' : '*.vim')
-
-    " Create buffer if needed.
-    let output_bufnr = -1
-    if g:simpletap#output_to ==# 'buffer'
-        let output_bufnr = s:create_buffer()
-    endif
-
-    call s:begin_test_once()
-    let pass_all = 1
-    for t in s:glob(pat)
-        if !s:source(t)
-            let pass_all = 0
-        endif
-        call s:output_summary(output_bufnr)
-    endfor
-    call s:end_test_once()
-    call s:output_all_summary(output_bufnr, pass_all)
-
-    if g:simpletap#report && output_bufnr ==# -1
-        messages
-    endif
+function! simpletap#run_dir(...) "{{{
+    return call(s:tap.run_dir, a:000, s:tap)
 endfunction "}}}
-call s:add_method('run_dir')
 
 
-function! simpletap#ok(cond, ...) "{{{
-    let testname = a:0 != 0 ? a:1 : ''
-
-    if a:cond
-        return s:passed(testname, 'ok')
-    else
-        return s:failed(testname, 'ok')
-    endif
+function! simpletap#ok(...) "{{{
+    return call(s:tap.ok, a:000, s:tap)
 endfunction "}}}
-call s:add_method('ok')
 
 
-function! simpletap#cmp_ok(Got, op, Expected, ...) "{{{
-    let testname = a:0 != 0 ? a:1 : ''
-
-    if s:cmp(a:Got, a:op, a:Expected)
-        return s:passed(testname, 'cmp_ok')
-    else
-        " TODO Output a:op.
-        return s:failed(testname, 'cmp_ok', a:Got, a:Expected)
-    endif
+function! simpletap#cmp_ok(...) "{{{
+    return call(s:tap.cmp_ok, a:000, s:tap)
 endfunction "}}}
-call s:add_method('cmp_ok')
 
 
-function! simpletap#is(Got, Expected, ...) "{{{
-    let testname = a:0 != 0 ? a:1 : ''
-
-    if s:equal(a:Got, a:Expected)
-        return s:passed(testname, 'is')
-    else
-        return s:failed(testname, 'is', a:Got, a:Expected)
-    endif
+function! simpletap#is(...) "{{{
+    return call(s:tap.is, a:000, s:tap)
 endfunction "}}}
-call s:add_method('is')
 
-function! simpletap#isnt(Got, Expected, ...) "{{{
-    let testname = a:0 != 0 ? a:1 : ''
-
-    if !s:equal(a:Got, a:Expected)
-        return s:passed(testname, 'isnt')
-    else
-        return s:failed(testname, 'isnt', a:Got, a:Expected)
-    endif
+function! simpletap#isnt(...) "{{{
+    return call(s:tap.isnt, a:000, s:tap)
 endfunction "}}}
-call s:add_method('isnt')
 
 
-function! simpletap#is_deeply(Got, Expected, ...) "{{{
-    let testname = a:0 != 0 ? a:1 : ''
-
-    if s:equal_deeply(a:Got, a:Expected)
-        return s:passed(testname, 'is_deeply')
-    else
-        return s:failed(testname, 'is_deeply', a:Got, a:Expected)
-    endif
+function! simpletap#is_deeply(...) "{{{
+    return call(s:tap.is_deeply, a:000, s:tap)
 endfunction "}}}
-call s:add_method('is_deeply')
 
 
-function! simpletap#like(Got, regex, ...) "{{{
-    let testname = a:0 != 0 ? a:1 : ''
-
-    if s:like(a:Got, a:regex)
-        return s:passed(testname, 'like')
-    else
-        return s:failed(testname, 'like', a:Got, a:regex)
-    endif
+function! simpletap#like(...) "{{{
+    return call(s:tap.like, a:000, s:tap)
 endfunction "}}}
-call s:add_method('like')
 
-function! simpletap#unlike(Got, regex, ...) "{{{
-    let testname = a:0 != 0 ? a:1 : ''
-
-    if !s:like(a:Got, a:regex)
-        return s:passed(testname, 'unlike')
-    else
-        return s:failed(testname, 'unlike', a:Got, a:regex)
-    endif
+function! simpletap#unlike(...) "{{{
+    return call(s:tap.unlike, a:000, s:tap)
 endfunction "}}}
-call s:add_method('unlike')
 
 
-function! simpletap#throws_ok(excmd, regex, ...) "{{{
-    let testname = a:0 != 0 ? a:1 : ''
-
-    try
-        execute a:excmd
-    catch
-        let ex = v:exception
-    endtry
-
-    if exists('ex') && s:like(ex, a:regex)
-        return s:passed(testname, 'throws_ok')
-    else
-        return s:failed(testname, 'throws_ok', ex, a:regex)
-    endif
+function! simpletap#throws_ok(...) "{{{
+    return call(s:tap.throws_ok, a:000, s:tap)
 endfunction "}}}
-call s:add_method('throws_ok')
 
 
-function! simpletap#stdout_is(Code, Expected, ...) "{{{
-    let testname = a:0 != 0 ? a:1 : ''
-
-    let output = s:get_output(a:Code)
-    if s:equal(output, a:Expected)
-        return s:passed(testname, 'stdout_is')
-    else
-        return s:failed(testname, 'stdout_is', output, a:Expected)
-    endif
+function! simpletap#stdout_is(...) "{{{
+    return call(s:tap.stdout_is, a:000, s:tap)
 endfunction "}}}
-call s:add_method('stdout_is')
 
-function! simpletap#stdout_isnt(Code, Expected, ...) "{{{
-    let testname = a:0 != 0 ? a:1 : ''
-
-    let output = s:get_output(a:Code)
-    if !s:equal(output, a:Expected)
-        return s:passed(testname, 'stdout_isnt')
-    else
-        return s:failed(testname, 'stdout_isnt', output, a:Expected)
-    endif
+function! simpletap#stdout_isnt(...) "{{{
+    return call(s:tap.stdout_isnt, a:000, s:tap)
 endfunction "}}}
-call s:add_method('stdout_isnt')
 
-function! simpletap#stdout_like(Code, regex, ...) "{{{
-    let testname = a:0 != 0 ? a:1 : ''
-
-    let output = s:get_output(a:Code)
-    if s:like(output, a:regex)
-        return s:passed(testname, 'stdout_like')
-    else
-        return s:failed(testname, 'stdout_like', output, a:regex)
-    endif
+function! simpletap#stdout_like(...) "{{{
+    return call(s:tap.stdout_like, a:000, s:tap)
 endfunction "}}}
-call s:add_method('stdout_like')
 
-function! simpletap#stdout_unlike(Code, regex, ...) "{{{
-    let testname = a:0 != 0 ? a:1 : ''
-
-    let output = s:get_output(a:Code)
-    if !s:like(output, a:regex)
-        return s:passed(testname, 'stdout_unlike')
-    else
-        return s:failed(testname, 'stdout_unlike', output, a:regex)
-    endif
+function! simpletap#stdout_unlike(...) "{{{
+    return call(s:tap.stdout_unlike, a:000, s:tap)
 endfunction "}}}
-call s:add_method('stdout_unlike')
 
 
 function! simpletap#diag(...) "{{{
-    call s:stat.add('output_info', [g:simpletap#echohl_diag, '# ' . join(a:000)])
+    return call(s:tap.diag, a:000, s:tap)
 endfunction "}}}
-call s:add_method('diag')
 
 
-function! simpletap#pass() "{{{
-    return simpletap#ok(1)
+function! simpletap#pass(...) "{{{
+    return call(s:tap.pass, a:000, s:tap)
 endfunction "}}}
-call s:add_method('pass')
 
-function! simpletap#fail() "{{{
-    return simpletap#ok(0)
+function! simpletap#fail(...) "{{{
+    return call(s:tap.fail, a:000, s:tap)
 endfunction "}}}
-call s:add_method('fail')
 
 
 function! simpletap#skip(...) "{{{
-    if a:0 != 0
-        Diag a:1
-    endif
-    throw 'simpletap - SKIP'
+    return call(s:tap.skip, a:000, s:tap)
 endfunction "}}}
 
 " }}}
