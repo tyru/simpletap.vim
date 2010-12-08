@@ -48,7 +48,7 @@ endfunction "}}}
 
 function! simpletap#define_macro() "{{{
     call s:stat.initialize()
-    call s:begin_test_once()
+    call s:runner.define_commands()
     call s:stat.initialize()
 endfunction "}}}
 
@@ -220,95 +220,6 @@ endfunction "}}}
 
 
 
-function! s:begin_test_once() "{{{
-    " TODO Don't do it yourself
-    command!
-    \   -nargs=*
-    \   OK
-    \   call simpletap#ok(<args>)
-    command!
-    \   -nargs=*
-    \   Ok
-    \   call simpletap#ok(<args>)
-    command!
-    \   -nargs=*
-    \   Is
-    \   call simpletap#is(<args>)
-    command!
-    \   -nargs=*
-    \   Isnt
-    \   call simpletap#isnt(<args>)
-    command!
-    \   -nargs=*
-    \   IsDeeply
-    \   call simpletap#is_deeply(<args>)
-    command!
-    \   -nargs=*
-    \   Like
-    \   call simpletap#like(<args>)
-    command!
-    \   -nargs=*
-    \   Unlike
-    \   call simpletap#unlike(<args>)
-    command!
-    \   -nargs=*
-    \   ThrowsOK
-    \   call simpletap#throws_ok(<args>)
-    command!
-    \   -nargs=*
-    \   ThrowsOk
-    \   call simpletap#throws_ok(<args>)
-    command!
-    \   -nargs=*
-    \   StdoutIs
-    \   call simpletap#stdout_is(<args>)
-    command!
-    \   -nargs=*
-    \   StdoutIsnt
-    \   call simpletap#stdout_isnt(<args>)
-    command!
-    \   -nargs=*
-    \   StdoutLike
-    \   call simpletap#stdout_like(<args>)
-    command!
-    \   -nargs=*
-    \   StdoutUnlike
-    \   call simpletap#stdout_unlike(<args>)
-    command!
-    \   -nargs=*
-    \   Diag
-    \   call simpletap#diag(<args>)
-    command!
-    \   -nargs=*
-    \   Pass
-    \   call simpletap#pass(<args>)
-    command!
-    \   -nargs=*
-    \   Fail
-    \   call simpletap#fail(<args>)
-    command!
-    \   -nargs=*
-    \   Skip
-    \   call simpletap#skip(<args>)
-
-    command!
-    \   -nargs=* -bar
-    \   Done
-    \   call s:stat.set('done_testing', 1)
-
-    command!
-    \   -bar
-    \   StatLock
-    \   call s:stat.lock()
-    command!
-    \   -bar
-    \   StatUnlock
-    \   call s:stat.unlock()
-
-    call s:set_up_variables()
-endfunction "}}}
-
-
 function! s:set_up_variables() "{{{
     let s:runner = s:Runner.new()
     let s:tap = s:Simpletap.new()
@@ -452,7 +363,7 @@ function! {s:Runner.method('run_file')}(this, file) "{{{
         let output_bufnr = a:this.create_buffer()
     endif
 
-    call s:begin_test_once()
+    call a:this.define_commands()
     let passed = s:stat.source(file)
     call s:stat.output_summary(output_bufnr)
     call a:this.delete_commands()
@@ -477,7 +388,7 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
         let output_bufnr = a:this.create_buffer()
     endif
 
-    call s:begin_test_once()
+    call a:this.define_commands()
     let pass_all = 1
     for t in s:glob(pat)
         if !s:stat.source(t)
@@ -518,6 +429,95 @@ function! {s:Runner.method('create_buffer')}(this) "{{{
     highlight def link simpletapMessage Comment
 
     return bufnr('%')
+endfunction "}}}
+
+
+function! {s:Runner.method('define_commands')}(this) "{{{
+    " TODO Don't do it yourself
+    command!
+    \   -nargs=*
+    \   OK
+    \   call simpletap#ok(<args>)
+    command!
+    \   -nargs=*
+    \   Ok
+    \   call simpletap#ok(<args>)
+    command!
+    \   -nargs=*
+    \   Is
+    \   call simpletap#is(<args>)
+    command!
+    \   -nargs=*
+    \   Isnt
+    \   call simpletap#isnt(<args>)
+    command!
+    \   -nargs=*
+    \   IsDeeply
+    \   call simpletap#is_deeply(<args>)
+    command!
+    \   -nargs=*
+    \   Like
+    \   call simpletap#like(<args>)
+    command!
+    \   -nargs=*
+    \   Unlike
+    \   call simpletap#unlike(<args>)
+    command!
+    \   -nargs=*
+    \   ThrowsOK
+    \   call simpletap#throws_ok(<args>)
+    command!
+    \   -nargs=*
+    \   ThrowsOk
+    \   call simpletap#throws_ok(<args>)
+    command!
+    \   -nargs=*
+    \   StdoutIs
+    \   call simpletap#stdout_is(<args>)
+    command!
+    \   -nargs=*
+    \   StdoutIsnt
+    \   call simpletap#stdout_isnt(<args>)
+    command!
+    \   -nargs=*
+    \   StdoutLike
+    \   call simpletap#stdout_like(<args>)
+    command!
+    \   -nargs=*
+    \   StdoutUnlike
+    \   call simpletap#stdout_unlike(<args>)
+    command!
+    \   -nargs=*
+    \   Diag
+    \   call simpletap#diag(<args>)
+    command!
+    \   -nargs=*
+    \   Pass
+    \   call simpletap#pass(<args>)
+    command!
+    \   -nargs=*
+    \   Fail
+    \   call simpletap#fail(<args>)
+    command!
+    \   -nargs=*
+    \   Skip
+    \   call simpletap#skip(<args>)
+
+    command!
+    \   -nargs=* -bar
+    \   Done
+    \   call s:stat.set('done_testing', 1)
+
+    command!
+    \   -bar
+    \   StatLock
+    \   call s:stat.lock()
+    command!
+    \   -bar
+    \   StatUnlock
+    \   call s:stat.unlock()
+
+    call s:set_up_variables()
 endfunction "}}}
 
 function! {s:Runner.method('delete_commands')}(this) "{{{
