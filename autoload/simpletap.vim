@@ -1227,6 +1227,24 @@ function! {s:Stat.method('begin_test')}(this, file) "{{{
     call a:this.add('output_info', [hl, msg])
 endfunction "}}}
 
+function! {s:Stat.method('end_test')}(this, file, skipped) "{{{
+    let test_result = a:this.get('test_result')
+    let failed_result_num = len(filter(copy(test_result), 'v:val ==# s:FAIL'))
+    let passed_result_num = len(test_result) - failed_result_num
+
+    if a:skipped
+        call a:this.add('output_info', [g:simpletap#echohl_skip, 'Skip.'])
+    elseif !a:this.get('done_testing')
+        call s:warnf("test '%s' has not done properly.", a:file)
+    elseif empty(test_result)
+        call s:warnf("test '%s' has done but no tests performed.", a:file)
+    else
+        let hl = (failed_result_num ? g:simpletap#echohl_error : g:simpletap#echohl_done)
+        let msg = printf('Done %d test(s). (PASS:%d, FAIL:%d)', passed_result_num + failed_result_num, passed_result_num, failed_result_num)
+        call a:this.add('output_info', [hl, msg])
+    endif
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
