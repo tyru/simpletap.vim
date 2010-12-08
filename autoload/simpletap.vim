@@ -33,67 +33,7 @@ set cpo&vim
 
 
 " Variables {{{
-" s:test_stat {{{
-let s:test_stat = {
-\   'vars': {
-\       'current_test_num': 1,
-\       'done_testing': 0,
-\       'test_result': [],
-\       'output_info': [],
-\       'finalizer': {},
-\   },
-\
-\   'is_locked': 0,
-\}
-
-function! s:test_vars_new() "{{{
-    return deepcopy(s:test_stat)
-endfunction "}}}
-
-function! s:test_stat.initialize() dict "{{{
-    for [key, val] in items(s:test_stat.vars)
-        call self.set(key, val)
-        unlet val
-    endfor
-endfunction "}}}
-
-function! s:test_stat.get(varname) dict "{{{
-    return self.vars[a:varname]
-endfunction "}}}
-
-function! s:test_stat.set(varname, value) dict "{{{
-    if self.is_locked | return | endif
-
-    let self.vars[a:varname] = a:value
-endfunction "}}}
-
-function! s:test_stat.increment(varname) dict "{{{
-    if self.is_locked | return | endif
-
-    let val = self.get(a:varname)
-    call s:assert(type(val) == type(0), 'type(val) is Number')
-    call self.set(a:varname, val + 1)
-endfunction "}}}
-
-function! s:test_stat.add(varname, value) dict "{{{
-    if self.is_locked | return | endif
-
-    let list = self.get(a:varname)
-    call s:assert(type(list) == type([]), 'type(list) is List')
-    call self.set(a:varname, add(list, a:value))
-endfunction "}}}
-
-function! s:test_stat.lock() dict "{{{
-    let self.is_locked = 1
-endfunction "}}}
-
-function! s:test_stat.unlock() dict "{{{
-    let self.is_locked = 0
-endfunction "}}}
-
-" }}}
-
-let s:stat = s:test_vars_new()
+let s:stat = {}
 
 let s:PASS = 1
 let s:FAIL = 2
@@ -434,6 +374,8 @@ function! s:begin_test_once() "{{{
     \   -bar
     \   StatUnlock
     \   call s:stat.unlock()
+
+    let s:stat = s:Stat.new()
 endfunction "}}}
 
 function! s:begin_test(file) "{{{
