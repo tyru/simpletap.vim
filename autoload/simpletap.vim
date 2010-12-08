@@ -185,33 +185,6 @@ function! s:assert(cond, msg) "{{{
     endif
 endfunction "}}}
 
-function! s:get_output(Code) "{{{
-    call s:stat.lock()
-
-    redir END
-    redir => output
-
-    try
-        if type(a:Code) == type(function('tr'))
-            let ex = 'call a:Code()'
-        elseif type(a:Code) == type("")
-            let ex = 'execute a:Code'
-        else
-            throw s:error("type error")
-        endif
-        if g:simpletap#silent
-            silent execute ex
-        else
-            execute ex
-        endif
-        redir END
-        return substitute(output, '^\n', '', '')
-    finally
-        redir END
-        call s:stat.unlock()
-    endtry
-endfunction "}}}
-
 function! s:format_to_string(val) "{{{
     if exists('g:loaded_prettyprint')
         return PrettyPrint(a:val)
@@ -579,7 +552,7 @@ endfunction "}}}
 function! {s:Simpletap.method('stdout_is')}(this, Code, Expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
-    let output = s:get_output(a:Code)
+    let output = a:this._stat.get_output(a:Code)
     if s:equal(output, a:Expected)
         return a:this._stat.passed(testname, 'stdout_is')
     else
@@ -590,7 +563,7 @@ endfunction "}}}
 function! {s:Simpletap.method('stdout_isnt')}(this, Code, Expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
-    let output = s:get_output(a:Code)
+    let output = a:this._stat.get_output(a:Code)
     if !s:equal(output, a:Expected)
         return a:this._stat.passed(testname, 'stdout_isnt')
     else
@@ -601,7 +574,7 @@ endfunction "}}}
 function! {s:Simpletap.method('stdout_like')}(this, Code, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
-    let output = s:get_output(a:Code)
+    let output = a:this._stat.get_output(a:Code)
     if s:like(output, a:regex)
         return a:this._stat.passed(testname, 'stdout_like')
     else
@@ -612,7 +585,7 @@ endfunction "}}}
 function! {s:Simpletap.method('stdout_unlike')}(this, Code, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
-    let output = s:get_output(a:Code)
+    let output = a:this._stat.get_output(a:Code)
     if !s:like(output, a:regex)
         return a:this._stat.passed(testname, 'stdout_unlike')
     else
