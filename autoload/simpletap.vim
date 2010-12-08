@@ -977,6 +977,16 @@ function! {s:Simpletap.method('like')}(this, Got, regex, ...) "{{{
     endif
 endfunction "}}}
 
+function! {s:Simpletap.method('unlike')}(this, Got, regex, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    if !s:like(a:Got, a:regex)
+        return s:passed(testname, 'unlike')
+    else
+        return s:failed(testname, 'unlike', a:Got, a:regex)
+    endif
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
