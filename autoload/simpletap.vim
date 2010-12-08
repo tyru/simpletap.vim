@@ -33,6 +33,7 @@ set cpo&vim
 
 
 " Variables
+let s:runner = {}
 let s:tap = {}
 let s:stat = {}
 
@@ -527,6 +528,7 @@ endfunction "}}}
 
 
 function! s:set_up_variables() "{{{
+    let s:runner = s:Runner.new()
     let s:tap = s:Simpletap.new()
     let s:stat = s:tap._stat
 endfunction "}}}
@@ -547,15 +549,15 @@ endfunction "}}}
 
 
 function! simpletap#run(...) "{{{
-    return call(s:tap.run, a:000, s:tap)
+    return call(s:runner.run, a:000, s:runner)
 endfunction "}}}
 
 function! simpletap#run_file(...) "{{{
-    return call(s:tap.run_file, a:000, s:tap)
+    return call(s:runner.run_file, a:000, s:runner)
 endfunction "}}}
 
 function! simpletap#run_dir(...) "{{{
-    return call(s:tap.run_dir, a:000, s:tap)
+    return call(s:runner.run_dir, a:000, s:runner)
 endfunction "}}}
 
 
@@ -642,19 +644,14 @@ endfunction "}}}
 let s:SID_PREFIX = s:SID()
 delfunc s:SID
 
-" s:Simpletap {{{
-let s:Simpletap = vice#class(
-\   'Simpletap',
+" s:Runner {{{
+let s:Runner = vice#class(
+\   'Runner',
 \   s:SID_PREFIX,
 \   {'generate_stub': 1}
 \)
 
-function! {s:Simpletap.constructor()}(this) "{{{
-    let a:this._stat = s:Stat.new()
-endfunction "}}}
-
-
-function! {s:Simpletap.method('run')}(this, path) "{{{
+function! {s:Runner.method('run')}(this, path) "{{{
     if getftype(a:path) == ''
         return
     endif
@@ -665,7 +662,7 @@ function! {s:Simpletap.method('run')}(this, path) "{{{
     endif
 endfunction "}}}
 
-function! {s:Simpletap.method('run_file')}(this, file) "{{{
+function! {s:Runner.method('run_file')}(this, file) "{{{
     let file = expand(a:file)
     if !filereadable(file)
         call s:warnf("'%s' is not file.", file)
@@ -689,7 +686,7 @@ function! {s:Simpletap.method('run_file')}(this, file) "{{{
     endif
 endfunction "}}}
 
-function! {s:Simpletap.method('run_dir')}(this, dir) "{{{
+function! {s:Runner.method('run_dir')}(this, dir) "{{{
     let dir = expand(a:dir)
     if !isdirectory(dir)
         call s:warnf("'%s' is not directory.", dir)
@@ -718,6 +715,19 @@ function! {s:Simpletap.method('run_dir')}(this, dir) "{{{
         messages
     endif
 endfunction "}}}
+
+" }}}
+" s:Simpletap {{{
+let s:Simpletap = vice#class(
+\   'Simpletap',
+\   s:SID_PREFIX,
+\   {'generate_stub': 1}
+\)
+
+function! {s:Simpletap.constructor()}(this) "{{{
+    let a:this._stat = s:Stat.new()
+endfunction "}}}
+
 
 
 function! {s:Simpletap.method('finalizer')}(this) "{{{
