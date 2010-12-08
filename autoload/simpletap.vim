@@ -891,6 +891,36 @@ function! {s:Simpletap.method('run_file')}(this, file) "{{{
     endif
 endfunction "}}}
 
+function! {s:Simpletap.method('run_dir')}(this, dir) "{{{
+    let dir = expand(a:dir)
+    if !isdirectory(dir)
+        call s:warnf("'%s' is not directory.", dir)
+        return
+    endif
+    let pat = dir . '/' . (g:simpletap#recursive ? '**/*.vim' : '*.vim')
+
+    " Create buffer if needed.
+    let output_bufnr = -1
+    if g:simpletap#output_to ==# 'buffer'
+        let output_bufnr = s:create_buffer()
+    endif
+
+    call s:begin_test_once()
+    let pass_all = 1
+    for t in s:glob(pat)
+        if !s:source(t)
+            let pass_all = 0
+        endif
+        call s:output_summary(output_bufnr)
+    endfor
+    call s:end_test_once()
+    call s:output_all_summary(output_bufnr, pass_all)
+
+    if g:simpletap#report && output_bufnr ==# -1
+        messages
+    endif
+endfunction "}}}
+
 
 function! {s:Simpletap.method('ok')}(this, cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
