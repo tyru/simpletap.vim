@@ -91,15 +91,12 @@ function! s:test_stat.unlock() dict "{{{
     let self.is_locked = 0
 endfunction "}}}
 
-lockvar s:test_stat
 " }}}
 
 let s:stat = s:test_vars_new()
 
 let s:PASS = 1
-lockvar s:PASS
 let s:FAIL = 2
-lockvar s:FAIL
 " }}}
 
 " Functions {{{
@@ -189,7 +186,6 @@ function! s:initialize_once() "{{{
     delfunc s:def
     delfunc s:def_hash
 
-    lockvar s:simpletap
 endfunction "}}}
 
 
@@ -600,7 +596,6 @@ function! simpletap#new(...) "{{{
     let obj = deepcopy(s:simpletap)
 
     let obj.save_prop = a:0 != 0 ? a:1 : {}
-    lockvar obj.save_prop
 
     let obj.stat = deepcopy(s:stat)
 
