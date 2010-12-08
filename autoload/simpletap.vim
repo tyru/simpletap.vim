@@ -922,6 +922,11 @@ function! {s:Simpletap.method('run_dir')}(this, dir) "{{{
 endfunction "}}}
 
 
+function! {s:Simpletap.method('finalizer')}(this) "{{{
+    return a:this._stat.get('finalizer')
+endfunction "}}}
+
+
 function! {s:Simpletap.method('ok')}(this, cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
