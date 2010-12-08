@@ -32,14 +32,13 @@ set cpo&vim
 "   - Use ok() in :try, not in :catch.
 
 
-" Variables {{{
+" Variables
 let s:stat = {}
 
 let s:PASS = 1
 let s:FAIL = 2
-" }}}
 
-" Functions {{{
+
 
 function! simpletap#load() "{{{
     runtime! plugin/simpletap.vim
@@ -837,7 +836,6 @@ endfunction "}}}
 
 " }}}
 
-" }}}
 
 
 function! s:SID() "{{{
@@ -1250,6 +1248,8 @@ function! {s:Stat.method('output_all_summary')}(this, bufnr, pass_all) "{{{
 endfunction "}}}
 
 " }}}
+
+
 
 call s:initialize_once()
 
