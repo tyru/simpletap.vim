@@ -1003,6 +1003,17 @@ function! {s:Simpletap.method('throws_ok')}(this, excmd, regex, ...) "{{{
     endif
 endfunction "}}}
 
+function! {s:Simpletap.method('stdout_is')}(this, Code, Expected, ...) "{{{
+    let testname = a:0 != 0 ? a:1 : ''
+
+    let output = s:get_output(a:Code)
+    if s:equal(output, a:Expected)
+        return s:passed(testname, 'stdout_is')
+    else
+        return s:failed(testname, 'stdout_is', output, a:Expected)
+    endif
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
