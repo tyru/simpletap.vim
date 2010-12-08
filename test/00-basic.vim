@@ -6,7 +6,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-func! s:run() "{{{
+function! s:run() "{{{
     Skip
 
     call simpletap#stdout_like(
@@ -17,7 +17,7 @@ func! s:run() "{{{
     \   "call simpletap#ok(1)",
     \   'NOT ok'
     \)
-endfunc "}}}
+endfunction "}}}
 
 
 call s:run()

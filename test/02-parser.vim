@@ -6,9 +6,9 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-func! s:run() "{{{
+function! s:run() "{{{
     call simpletap#pass()
-endfunc "}}}
+endfunction "}}}
 
 
 call s:run()

@@ -6,7 +6,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-func! s:get_args(method) "{{{
+function! s:get_args(method) "{{{
     let args = {
     \   'ok': [1],
     \   'cmp_ok': [1, '==', 1],
@@ -32,9 +32,9 @@ func! s:get_args(method) "{{{
     else
         throw 'no args'
     endif
-endfunc "}}}
+endfunction "}}}
 
-func! s:run() "{{{
+function! s:run() "{{{
     let o = simpletap#new()
 
     Diag 'OO way and function way result in same result.'
@@ -74,7 +74,7 @@ func! s:run() "{{{
             Is got_output, expected_output, method
         endif
     endfor
-endfunc "}}}
+endfunction "}}}
 
 
 call s:run()
