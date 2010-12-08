@@ -8,7 +8,7 @@ set cpo&vim
 
 
 
-function! simpletap#test#really_exists_func(Fn, ...) "{{{
+function! simpletap#util#really_exists_func(Fn, ...) "{{{
     let args = a:0 != 0 ? a:1 : []
 
     try
@@ -29,7 +29,7 @@ function! simpletap#test#really_exists_func(Fn, ...) "{{{
     endtry
 endfunction "}}}
 
-function! simpletap#test#get_local_func(pat, funcname) "{{{
+function! simpletap#util#get_local_func(pat, funcname) "{{{
     redir => out
     silent scriptnames
     redir END
