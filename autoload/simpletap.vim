@@ -342,15 +342,6 @@ function! s:output(bufnr, lines) "{{{
     endif
 endfunction "}}}
 
-function! s:output_summary(bufnr) "{{{
-    let results = copy(s:stat.get('test_result'))
-    let failed = !empty(filter(results, 'v:val ==# s:FAIL'))
-    let output_info = s:stat.get('output_info')
-    if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
-        call s:output(a:bufnr, output_info)
-    endif
-endfunction "}}}
-
 function! s:output_all_summary(bufnr, pass_all) "{{{
     let lines = []
 
@@ -540,7 +531,7 @@ function! {s:Runner.method('run_file')}(this, file) "{{{
 
     call s:begin_test_once()
     let passed = s:stat.source(file)
-    call s:output_summary(output_bufnr)
+    call s:stat.output_summary(output_bufnr)
     call s:end_test_once()
     call s:output_all_summary(output_bufnr, passed)
 
@@ -569,7 +560,7 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
         if !s:stat.source(t)
             let pass_all = 0
         endif
-        call s:output_summary(output_bufnr)
+        call s:stat.output_summary(output_bufnr)
     endfor
     call s:end_test_once()
     call s:output_all_summary(output_bufnr, pass_all)
