@@ -1245,6 +1245,42 @@ function! {s:Stat.method('end_test')}(this, file, skipped) "{{{
     endif
 endfunction "}}}
 
+function! {s:Stat.method('source')}(this, file) "{{{
+    call s:begin_test(a:file)
+    try
+        source `=a:file`
+        call s:end_test(a:file, 0)
+        let results = a:this.get('test_result')
+        let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
+        return failed ? 0 : 1
+    catch /^simpletap - SKIP$/
+        call s:end_test(a:file, 1)
+        return 1
+    catch
+        for msg in [
+        \   '!!!# Exception throwed.',
+        \   '!!!# v:exception = ' . string(v:exception),
+        \   '!!!# v:throwpoint = ' . string(v:throwpoint),
+        \]
+            if g:simpletap#show_exception
+                call s:warn(msg)
+            endif
+            call a:this.add('output_info', [g:simpletap#echohl_error, msg])
+        endfor
+        call a:this.add('test_result', s:FAIL)    " dummy
+        return 0
+    finally
+        let f = a:this.get('finalizer')
+        for name in empty(f) ? [] : sort(keys(f))
+            let call_args = [f[name].fn, f[name].args, f[name]]
+            if has_key(f[name], 'dict')
+                call add(call_args, f[name].dict)
+            endif
+            call call('call', call_args)
+        endfor
+    endtry
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
