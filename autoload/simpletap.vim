@@ -333,13 +333,13 @@ endfunction "}}}
 
 function! s:create_buffer() "{{{
     new
-    
+
     " Clean up the screen.
     % delete _
-    
+
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
     setlocal filetype=simpletap-summary
-    
+
     if has('conceal')
         setlocal conceallevel=3
         setlocal concealcursor=n
@@ -350,11 +350,11 @@ function! s:create_buffer() "{{{
     endif
     syntax match simpletapError   '^!!!.*' contains=simpletapErrorHidden
     syntax match simpletapMessage   '^#.*'
-    
+
     highlight def link simpletapError Error
     highlight def link simpletapErrorHidden Ignore
     highlight def link simpletapMessage Comment
-    
+
     return bufnr('%')
 endfunction "}}}
 
