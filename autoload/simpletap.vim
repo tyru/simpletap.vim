@@ -219,27 +219,6 @@ function! s:cmp(l, op, r) "{{{
 endfunction "}}}
 
 
-function! s:passed(testname, funcname) "{{{
-    call s:stat.add(
-    \   'output_info',
-    \   [
-    \       g:simpletap#echohl_output,
-    \       printf(
-    \          '%d. %s ... %s',
-    \          s:stat.get('current_test_num'),
-    \          a:testname,
-    \          g:simpletap#pass_fmt[a:funcname]
-    \       )
-    \   ]
-    \)
-
-    call s:stat.add('test_result', s:PASS)
-
-    call s:stat.step_num()
-
-    return 1
-endfunction "}}}
-
 function! s:failed(testname, funcname, ...) "{{{
     if a:0 == 0
         call s:stat.add(
@@ -716,7 +695,7 @@ function! {s:Simpletap.method('ok')}(this, cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if a:cond
-        return s:passed(testname, 'ok')
+        return a:this._stat.passed(testname, 'ok')
     else
         return s:failed(testname, 'ok')
     endif
@@ -726,7 +705,7 @@ function! {s:Simpletap.method('cmp_ok')}(this, Got, op, Expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:cmp(a:Got, a:op, a:Expected)
-        return s:passed(testname, 'cmp_ok')
+        return a:this._stat.passed(testname, 'cmp_ok')
     else
         " TODO Output a:op.
         return s:failed(testname, 'cmp_ok', a:Got, a:Expected)
@@ -737,7 +716,7 @@ function! {s:Simpletap.method('is')}(this, Got, Expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:equal(a:Got, a:Expected)
-        return s:passed(testname, 'is')
+        return a:this._stat.passed(testname, 'is')
     else
         return s:failed(testname, 'is', a:Got, a:Expected)
     endif
@@ -747,7 +726,7 @@ function! {s:Simpletap.method('isnt')}(this, Got, Expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if !s:equal(a:Got, a:Expected)
-        return s:passed(testname, 'isnt')
+        return a:this._stat.passed(testname, 'isnt')
     else
         return s:failed(testname, 'isnt', a:Got, a:Expected)
     endif
@@ -757,7 +736,7 @@ function! {s:Simpletap.method('is_deeply')}(this, Got, Expected, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:equal_deeply(a:Got, a:Expected)
-        return s:passed(testname, 'is_deeply')
+        return a:this._stat.passed(testname, 'is_deeply')
     else
         return s:failed(testname, 'is_deeply', a:Got, a:Expected)
     endif
@@ -767,7 +746,7 @@ function! {s:Simpletap.method('like')}(this, Got, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if s:like(a:Got, a:regex)
-        return s:passed(testname, 'like')
+        return a:this._stat.passed(testname, 'like')
     else
         return s:failed(testname, 'like', a:Got, a:regex)
     endif
@@ -777,7 +756,7 @@ function! {s:Simpletap.method('unlike')}(this, Got, regex, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
     if !s:like(a:Got, a:regex)
-        return s:passed(testname, 'unlike')
+        return a:this._stat.passed(testname, 'unlike')
     else
         return s:failed(testname, 'unlike', a:Got, a:regex)
     endif
@@ -793,7 +772,7 @@ function! {s:Simpletap.method('throws_ok')}(this, excmd, regex, ...) "{{{
     endtry
 
     if exists('ex') && s:like(ex, a:regex)
-        return s:passed(testname, 'throws_ok')
+        return a:this._stat.passed(testname, 'throws_ok')
     else
         return s:failed(testname, 'throws_ok', ex, a:regex)
     endif
@@ -804,7 +783,7 @@ function! {s:Simpletap.method('stdout_is')}(this, Code, Expected, ...) "{{{
 
     let output = s:get_output(a:Code)
     if s:equal(output, a:Expected)
-        return s:passed(testname, 'stdout_is')
+        return a:this._stat.passed(testname, 'stdout_is')
     else
         return s:failed(testname, 'stdout_is', output, a:Expected)
     endif
@@ -815,7 +794,7 @@ function! {s:Simpletap.method('stdout_isnt')}(this, Code, Expected, ...) "{{{
 
     let output = s:get_output(a:Code)
     if !s:equal(output, a:Expected)
-        return s:passed(testname, 'stdout_isnt')
+        return a:this._stat.passed(testname, 'stdout_isnt')
     else
         return s:failed(testname, 'stdout_isnt', output, a:Expected)
     endif
@@ -826,7 +805,7 @@ function! {s:Simpletap.method('stdout_like')}(this, Code, regex, ...) "{{{
 
     let output = s:get_output(a:Code)
     if s:like(output, a:regex)
-        return s:passed(testname, 'stdout_like')
+        return a:this._stat.passed(testname, 'stdout_like')
     else
         return s:failed(testname, 'stdout_like', output, a:regex)
     endif
@@ -837,7 +816,7 @@ function! {s:Simpletap.method('stdout_unlike')}(this, Code, regex, ...) "{{{
 
     let output = s:get_output(a:Code)
     if !s:like(output, a:regex)
-        return s:passed(testname, 'stdout_unlike')
+        return a:this._stat.passed(testname, 'stdout_unlike')
     else
         return s:failed(testname, 'stdout_unlike', output, a:regex)
     endif
