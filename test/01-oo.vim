@@ -51,8 +51,8 @@ function! s:run() "{{{
             continue
         endtry
 
-        " methods using :redir cannot be tested
-        " because these tests use :redir
+        " Methods using :redir cannot be tested.
+        " Because these tests use :redir .
         " TODO Stackable :redir
         if method ==# 'stdout_is'
         \ || method ==# 'stdout_isnt'
