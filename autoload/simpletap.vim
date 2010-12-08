@@ -331,33 +331,6 @@ function! s:end_test_once() "{{{
     delcommand StatUnlock
 endfunction "}}}
 
-function! s:source(file) "{{{
-    call s:stat.begin_test(a:file)
-    try
-        source `=a:file`
-        call s:stat.end_test(a:file, 0)
-        let results = s:stat.get('test_result')
-        let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
-        return failed ? 0 : 1
-    catch /^simpletap - SKIP$/
-        call s:stat.end_test(a:file, 1)
-        return 1
-    catch
-        for msg in [
-        \   '!!!# Exception throwed.',
-        \   '!!!# v:exception = ' . string(v:exception),
-        \   '!!!# v:throwpoint = ' . string(v:throwpoint),
-        \]
-            if g:simpletap#show_exception
-                call s:warn(msg)
-            endif
-            call s:stat.add('output_info', [g:simpletap#echohl_error, msg])
-        endfor
-        call s:stat.add('test_result', s:FAIL)    " dummy
-        return 0
-    endtry
-endfunction "}}}
-
 function! s:output(bufnr, lines) "{{{
     if a:bufnr ==# -1
         for [hl, msg] in a:lines
@@ -566,7 +539,7 @@ function! {s:Runner.method('run_file')}(this, file) "{{{
     endif
 
     call s:begin_test_once()
-    let passed = s:source(file)
+    let passed = s:stat.source(file)
     call s:output_summary(output_bufnr)
     call s:end_test_once()
     call s:output_all_summary(output_bufnr, passed)
@@ -593,7 +566,7 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
     call s:begin_test_once()
     let pass_all = 1
     for t in s:glob(pat)
-        if !s:source(t)
+        if !s:stat.source(t)
             let pass_all = 0
         endif
         call s:output_summary(output_bufnr)
