@@ -49,7 +49,6 @@ function! simpletap#load() "{{{
 endfunction "}}}
 
 function! simpletap#define_macro() "{{{
-    call s:stat.initialize()
     call s:runner.define_commands()
     call s:stat.initialize()
 endfunction "}}}
