@@ -1055,6 +1055,10 @@ function! {s:Simpletap.method('pass')}(this) "{{{
     return a:this.ok(1)
 endfunction "}}}
 
+function! {s:Simpletap.method('fail')}(this) "{{{
+    return a:this.ok(0)
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
