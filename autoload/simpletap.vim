@@ -1121,6 +1121,33 @@ function! {s:Stat.method('unlock')}(this) "{{{
     let a:this.is_locked = 0
 endfunction "}}}
 
+function! {s:Stat.method('get_output')}(this, Code) "{{{
+    call a:this.lock()
+
+    redir END
+    redir => output
+
+    try
+        if type(a:Code) == type(function('tr'))
+            let ex = 'call a:Code()'
+        elseif type(a:Code) == type("")
+            let ex = 'execute a:Code'
+        else
+            throw s:error("type error")
+        endif
+        if g:simpletap#silent
+            silent execute ex
+        else
+            execute ex
+        endif
+        redir END
+        return substitute(output, '^\n', '', '')
+    finally
+        redir END
+        call a:this.unlock()
+    endtry
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
