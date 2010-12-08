@@ -1216,6 +1216,17 @@ function! {s:Stat.method('step_num')}(this) "{{{
     call a:this.increment('current_test_num')
 endfunction "}}}
 
+
+function! {s:Stat.method('begin_test')}(this, file) "{{{
+    call a:this.initialize()
+
+    let [hl, msg] = [g:simpletap#echohl_begin, 'Testing ... ' . a:file]
+    if g:simpletap#output_to ==# 'buffer'
+        call s:echomsg(hl, msg)
+    endif
+    call a:this.add('output_info', [hl, msg])
+endfunction "}}}
+
 " }}}
 
 call s:initialize_once()
