@@ -331,33 +331,6 @@ function! s:end_test_once() "{{{
     delcommand StatUnlock
 endfunction "}}}
 
-function! s:create_buffer() "{{{
-    new
-
-    " Clean up the screen.
-    % delete _
-
-    setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
-    setlocal filetype=simpletap-summary
-
-    if has('conceal')
-        setlocal conceallevel=3
-        setlocal concealcursor=n
-
-        syntax match   simpletapErrorHidden            '^!!!' contained conceal
-    else
-        syntax match   simpletapErrorHidden            '^!!!' contained
-    endif
-    syntax match simpletapError   '^!!!.*' contains=simpletapErrorHidden
-    syntax match simpletapMessage   '^#.*'
-
-    highlight def link simpletapError Error
-    highlight def link simpletapErrorHidden Ignore
-    highlight def link simpletapMessage Comment
-
-    return bufnr('%')
-endfunction "}}}
-
 
 function! s:set_up_variables() "{{{
     let s:runner = s:Runner.new()
@@ -499,7 +472,7 @@ function! {s:Runner.method('run_file')}(this, file) "{{{
     " Create buffer if needed.
     let output_bufnr = -1
     if g:simpletap#output_to ==# 'buffer'
-        let output_bufnr = s:create_buffer()
+        let output_bufnr = a:this.create_buffer()
     endif
 
     call s:begin_test_once()
@@ -524,7 +497,7 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
     " Create buffer if needed.
     let output_bufnr = -1
     if g:simpletap#output_to ==# 'buffer'
-        let output_bufnr = s:create_buffer()
+        let output_bufnr = a:this.create_buffer()
     endif
 
     call s:begin_test_once()
@@ -541,6 +514,33 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
     if g:simpletap#report && output_bufnr ==# -1
         messages
     endif
+endfunction "}}}
+
+function! {s:Runner.method('create_buffer')}(this) "{{{
+    new
+
+    " Clean up the screen.
+    % delete _
+
+    setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
+    setlocal filetype=simpletap-summary
+
+    if has('conceal')
+        setlocal conceallevel=3
+        setlocal concealcursor=n
+
+        syntax match   simpletapErrorHidden            '^!!!' contained conceal
+    else
+        syntax match   simpletapErrorHidden            '^!!!' contained
+    endif
+    syntax match simpletapError   '^!!!.*' contains=simpletapErrorHidden
+    syntax match simpletapMessage   '^#.*'
+
+    highlight def link simpletapError Error
+    highlight def link simpletapErrorHidden Ignore
+    highlight def link simpletapMessage Comment
+
+    return bufnr('%')
 endfunction "}}}
 
 " }}}
