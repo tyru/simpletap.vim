@@ -1,5 +1,10 @@
 #!/bin/sh
 
 
-[ $# != 0 ] && { cd "$1" || exit 1; }
-vim -c SimpleTapRunDir
+[ $# -eq 0 ] && exit 1
+if [ -d "$1" ]; then
+    cd "$1" || exit $?
+    vim -c SimpleTapRunDir
+elif [ -f "$1" ]; then
+    vim -c "SimpleTapRunFile $1"
+fi
