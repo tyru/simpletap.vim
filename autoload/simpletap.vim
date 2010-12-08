@@ -451,15 +451,6 @@ function! s:source(file) "{{{
         endfor
         call s:stat.add('test_result', s:FAIL)    " dummy
         return 0
-    finally
-        let f = s:stat.get('finalizer')
-        for name in empty(f) ? [] : sort(keys(f))
-            let call_args = [f[name].fn, f[name].args, f[name]]
-            if has_key(f[name], 'dict')
-                call add(call_args, f[name].dict)
-            endif
-            call call('call', call_args)
-        endfor
     endtry
 endfunction "}}}
 
@@ -542,11 +533,6 @@ endfunction "}}}
 
 
 " Autoload {{{
-
-function! simpletap#finalizer(...) "{{{
-    return call(s:tap.finalizer, a:000, s:tap)
-endfunction "}}}
-
 
 function! simpletap#run(...) "{{{
     return call(s:runner.run, a:000, s:runner)
@@ -730,11 +716,6 @@ endfunction "}}}
 
 
 
-function! {s:Simpletap.method('finalizer')}(this) "{{{
-    return a:this._stat.get('finalizer')
-endfunction "}}}
-
-
 function! {s:Simpletap.method('ok')}(this, cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
@@ -899,7 +880,6 @@ function! {s:Stat.constructor()}(this) "{{{
     \   'done_testing': 0,
     \   'test_result': [],
     \   'output_info': [],
-    \   'finalizer': {},
     \}
     let a:this.is_locked = 0
 endfunction "}}}
@@ -1094,15 +1074,6 @@ function! {s:Stat.method('source')}(this, file) "{{{
         endfor
         call a:this.add('test_result', s:FAIL)    " dummy
         return 0
-    finally
-        let f = a:this.get('finalizer')
-        for name in empty(f) ? [] : sort(keys(f))
-            let call_args = [f[name].fn, f[name].args, f[name]]
-            if has_key(f[name], 'dict')
-                call add(call_args, f[name].dict)
-            endif
-            call call('call', call_args)
-        endfor
     endtry
 endfunction "}}}
 
