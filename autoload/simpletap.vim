@@ -905,7 +905,6 @@ function! s:initialize() "{{{
     call s:def('g:simpletap#report', 1)
     call s:def('g:simpletap#output_to', 'buffer')
 
-    delfunc s:varname
     delfunc s:def
     delfunc s:def_hash
 
