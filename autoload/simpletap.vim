@@ -22,12 +22,6 @@ function! simpletap#load() "{{{
     runtime! plugin/simpletap.vim
 endfunction "}}}
 
-function! simpletap#define_macro() "{{{
-    call s:runner.define_commands()
-    call s:stat.initialize()
-endfunction "}}}
-
-
 
 function! simpletap#new(...) "{{{
     return s:Simpletap.new()
