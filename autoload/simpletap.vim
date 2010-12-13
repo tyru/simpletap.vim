@@ -115,6 +115,10 @@ function! simpletap#skip(...) "{{{
     return call(s:tap.skip, a:000, s:tap)
 endfunction "}}}
 
+function! simpletap#done(...) "{{{
+    return call(s:tap.done, a:000, s:tap)
+endfunction "}}}
+
 
 
 function! simpletap#_stat_lock() "{{{
@@ -392,7 +396,7 @@ function! {s:Runner.method('define_commands')}(this) "{{{
     command!
     \   -nargs=* -bar
     \   Done
-    \   call s:stat.set('done_testing', 1)
+    \   call simpletap#done()
 
 
     call s:set_up_variables()
@@ -581,6 +585,10 @@ function! {s:Simpletap.method('skip')}(this, ...) "{{{
         Diag a:1
     endif
     throw 'simpletap - SKIP'
+endfunction "}}}
+
+function! {s:Simpletap.method('done')}(this) "{{{
+    call s:stat.set('done_testing', 1)
 endfunction "}}}
 
 " }}}
