@@ -838,25 +838,20 @@ endfunction "}}}
 function! s:initialize_once() "{{{
     call simpletap#load()
 
-    function! s:varname(v) "{{{
-        return 'g:simpletap#' . a:v
-    endfunction "}}}
     function! s:def(varname, default) "{{{
-        let v = s:varname(a:varname)
-        if !exists(v)
-            let {v} = a:default
+        if !exists(a:varname)
+            let {a:varname} = a:default
         endif
     endfunction "}}}
     function! s:def_hash(varname, default) "{{{
-        let v = s:varname(a:varname)
-        if !exists(v)
-            let {v} = {}
+        if !exists(a:varname)
+            let {a:varname} = {}
         endif
-        call extend({v}, a:default, 'keep')
+        call extend({a:varname}, a:default, 'keep')
     endfunction "}}}
 
     call s:def_hash(
-    \   'pass_fmt',
+    \   'g:simpletap#pass_fmt',
     \   {
     \       'ok': 'ok',
     \       'cmp_ok': 'ok',
@@ -873,7 +868,7 @@ function! s:initialize_once() "{{{
     \   },
     \)
     call s:def_hash(
-    \   'fail_fmt',
+    \   'g:simpletap#fail_fmt',
     \   {
     \       'ok': 'NOT ok',
     \       'cmp_ok': 'got: %s, expected: %s',
@@ -889,18 +884,18 @@ function! s:initialize_once() "{{{
     \       'throws_ok': 'got exception: %s, expected like: %s',
     \   },
     \)
-    call s:def('silent', 1)
-    call s:def('echohl_diag', 'Comment')
-    call s:def('echohl_error', 'WarningMsg')
-    call s:def('echohl_begin', 'None')
-    call s:def('echohl_done', 'Underlined')
-    call s:def('echohl_skip', 'Underlined')
-    call s:def('echohl_output', 'None')
-    call s:def('recursive', 1)
-    call s:def('show_only_failed', 1)
-    call s:def('show_exception', 1)
-    call s:def('report', 1)
-    call s:def('output_to', 'buffer')
+    call s:def('g:simpletap#silent', 1)
+    call s:def('g:simpletap#echohl_diag', 'Comment')
+    call s:def('g:simpletap#echohl_error', 'WarningMsg')
+    call s:def('g:simpletap#echohl_begin', 'None')
+    call s:def('g:simpletap#echohl_done', 'Underlined')
+    call s:def('g:simpletap#echohl_skip', 'Underlined')
+    call s:def('g:simpletap#echohl_output', 'None')
+    call s:def('g:simpletap#recursive', 1)
+    call s:def('g:simpletap#show_only_failed', 1)
+    call s:def('g:simpletap#show_exception', 1)
+    call s:def('g:simpletap#report', 1)
+    call s:def('g:simpletap#output_to', 'buffer')
 
     delfunc s:varname
     delfunc s:def
