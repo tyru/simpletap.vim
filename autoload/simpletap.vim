@@ -843,7 +843,7 @@ endfunction "}}}
 " }}}
 
 
-function! s:initialize_once() "{{{
+function! s:initialize() "{{{
     call simpletap#load()
 
     function! s:def(varname, default) "{{{
@@ -911,7 +911,7 @@ function! s:initialize_once() "{{{
 
     call s:set_up_variables()
 endfunction "}}}
-call s:initialize_once()
+call s:initialize()
 
 
 " Restore 'cpoptions' {{{
