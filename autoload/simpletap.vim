@@ -254,7 +254,9 @@ function! {s:Runner.method('run_file')}(this, file) "{{{
     endif
 
     call a:this.define_commands()
+    call s:stat.begin_test(file)
     let passed = s:stat.source(file)
+    call s:stat.end_test(file)
     call s:stat.output_summary(output_bufnr)
     call a:this.delete_commands()
     call s:stat.output_all_summary(output_bufnr, passed)
@@ -281,9 +283,11 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
     call a:this.define_commands()
     let pass_all = 1
     for t in s:glob(pat)
+        call s:stat.begin_test(t)
         if !s:stat.source(t)
             let pass_all = 0
         endif
+        call s:stat.end_test(t)
         call s:stat.output_summary(output_bufnr)
     endfor
     call a:this.delete_commands()
@@ -777,16 +781,13 @@ function! {s:Stat.method('end_test')}(this, file) "{{{
 endfunction "}}}
 
 function! {s:Stat.method('source')}(this, file) "{{{
-    call a:this.begin_test(a:file)
     try
         source `=a:file`
-        call a:this.end_test(a:file)
         let results = a:this.get('test_result')
         let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
         return failed ? 0 : 1
     catch /^simpletap - SKIP$/
         call s:stat.set('skipped', 1)
-        call a:this.end_test(a:file)
         return 1
     catch
         for msg in [
