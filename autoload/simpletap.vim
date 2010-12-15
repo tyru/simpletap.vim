@@ -778,9 +778,6 @@ function! {s:Stat.method('source')}(this, file) "{{{
         \   '!!!# v:exception = ' . string(v:exception),
         \   '!!!# v:throwpoint = ' . string(v:throwpoint),
         \]
-            if g:simpletap#show_exception
-                call s:warn(msg)
-            endif
             call a:this.add('output_info', [g:simpletap#echohl_error, msg])
         endfor
         call a:this.add('test_result', s:FAIL)    " dummy
@@ -880,7 +877,6 @@ function! s:initialize() "{{{
     call s:def('g:simpletap#echohl_output', 'None')
     call s:def('g:simpletap#recursive', 1)
     call s:def('g:simpletap#show_only_failed', 1)
-    call s:def('g:simpletap#show_exception', 1)
 
     delfunc s:def
     delfunc s:def_hash
