@@ -57,6 +57,7 @@ function! s:run() "{{{
         \   'pass': [],
         \   'fail': [],
         \   'diag': ['diag test'],
+        \   'done': [],
         \}, method, not_found)
         if args is not_found
             Diag "unknown method: " . method
