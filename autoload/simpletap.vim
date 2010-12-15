@@ -594,7 +594,7 @@ function! {s:Stat.constructor()}(this) "{{{
     let a:this.vars = {
     \   'current_test_num': 1,
     \   'done_testing': 0,
-    \   'test_result': [],
+    \   'test_results': [],
     \   'output_info': [],
     \   'skipped': 0,
     \}
@@ -682,7 +682,7 @@ function! {s:Stat.method('passed')}(this, testname, funcname) "{{{
     \   ]
     \)
 
-    call a:this.add('test_result', s:PASS)
+    call a:this.add('test_results', s:PASS)
 
     call a:this.step_num()
 
@@ -725,7 +725,7 @@ function! {s:Stat.method('failed')}(this, testname, funcname, ...) "{{{
         endif
     endif
 
-    call a:this.add('test_result', s:FAIL)
+    call a:this.add('test_results', s:FAIL)
 
     call a:this.step_num()
 
@@ -746,15 +746,15 @@ function! {s:Stat.method('begin_test')}(this, file) "{{{
 endfunction "}}}
 
 function! {s:Stat.method('end_test')}(this, file) "{{{
-    let test_result = a:this.get('test_result')
-    let failed_result_num = len(filter(copy(test_result), 'v:val ==# s:FAIL'))
-    let passed_result_num = len(test_result) - failed_result_num
+    let test_results = a:this.get('test_results')
+    let failed_result_num = len(filter(copy(test_results), 'v:val ==# s:FAIL'))
+    let passed_result_num = len(test_results) - failed_result_num
 
     if s:stat.get('skipped')
         call a:this.add('output_info', [g:simpletap#echohl_skip, 'Skip.'])
     elseif !a:this.get('done_testing')
         call s:warnf("test '%s' has not done properly.", a:file)
-    elseif empty(test_result)
+    elseif empty(test_results)
         call s:warnf("test '%s' has done but no tests performed.", a:file)
     else
         let hl = (failed_result_num ? g:simpletap#echohl_error : g:simpletap#echohl_done)
@@ -766,7 +766,7 @@ endfunction "}}}
 function! {s:Stat.method('source')}(this, file) "{{{
     try
         source `=a:file`
-        let results = a:this.get('test_result')
+        let results = a:this.get('test_results')
         let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
         return failed ? 0 : 1
     catch /^simpletap - SKIP$/
@@ -780,7 +780,7 @@ function! {s:Stat.method('source')}(this, file) "{{{
         \]
             call a:this.add('output_info', [g:simpletap#echohl_error, msg])
         endfor
-        call a:this.add('test_result', s:FAIL)    " dummy
+        call a:this.add('test_results', s:FAIL)    " dummy
         return 0
     endtry
 endfunction "}}}
@@ -791,7 +791,7 @@ function! {s:Stat.method('output')}(this, lines) "{{{
 endfunction "}}}
 
 function! {s:Stat.method('output_summary')}(this) "{{{
-    let results = copy(a:this.get('test_result'))
+    let results = copy(a:this.get('test_results'))
     let failed = !empty(filter(results, 'v:val ==# s:FAIL'))
     let output_info = a:this.get('output_info')
     if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
@@ -805,7 +805,7 @@ function! {s:Stat.method('output_all_summary')}(this, pass_all) "{{{
     if a:pass_all
         call add(lines, ['None', ''])
         call add(lines, [g:simpletap#echohl_done, 'All test(s) passed.'])
-    elseif empty(a:this.get('test_result'))
+    elseif empty(a:this.get('test_results'))
         call add(lines, ['None', ''])
         call add(lines, [g:simpletap#echohl_error, 'no tests to run.'])
     else
