@@ -428,10 +428,10 @@ endfunction "}}}
 
 
 
-function! {s:Simpletap.method('ok')}(this, cond, ...) "{{{
+function! {s:Simpletap.method('ok')}(this, Cond, ...) "{{{
     let testname = a:0 != 0 ? a:1 : ''
 
-    if a:cond
+    if a:Cond
         return a:this._stat.passed(testname, 'ok')
     else
         return a:this._stat.failed(testname, 'ok')
