@@ -64,6 +64,8 @@ function! s:run() "{{{
             continue
         endif
 
+        Diag method
+
         " Methods using :redir cannot be tested.
         " Because these tests use :redir .
         " TODO Stackable :redir
