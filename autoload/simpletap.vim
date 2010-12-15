@@ -609,7 +609,7 @@ function! {s:Stat.method('initialize')}(this) "{{{
 endfunction "}}}
 
 function! {s:Stat.method('get')}(this, varname) "{{{
-    return a:this.vars[a:varname]
+    return copy(a:this.vars[a:varname])
 endfunction "}}}
 
 function! {s:Stat.method('set')}(this, varname, value) "{{{
