@@ -42,6 +42,10 @@ function! simpletap#run_dir(...) "{{{
     return call(s:runner.run_dir, a:000, s:runner)
 endfunction "}}}
 
+function! simpletap#run_single_test(...) "{{{
+    return call(s:runner.run_single_test, a:000, s:runner)
+endfunction "}}}
+
 
 function! simpletap#ok(...) "{{{
     return call(s:tap.ok, a:000, s:tap)
@@ -283,6 +287,12 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
     endfor
     call a:this.delete_commands()
     call s:stat.output_all_summary(pass_all)
+endfunction "}}}
+
+function! {s:Runner.method('run_single_test')}(this) "{{{
+    call s:runner.create_buffer()
+    call s:runner.define_commands()
+    call s:stat.set('running_single_test', 1)
 endfunction "}}}
 
 
@@ -580,6 +590,15 @@ endfunction "}}}
 
 function! {s:Simpletap.method('done')}(this) "{{{
     call s:stat.set('done_testing', 1)
+
+    if s:stat.get('running_single_test')
+        call s:stat.set('running_single_test', 0)
+
+        call s:stat.output_summary()
+        call s:runner.delete_commands()
+
+        call s:stat.output_all_summary(s:stat.passed_all())
+    endif
 endfunction "}}}
 
 " }}}
@@ -597,6 +616,7 @@ function! {s:Stat.constructor()}(this) "{{{
     \   'test_results': [],
     \   'output_info': [],
     \   'skipped': 0,
+    \   'running_single_test': 0,
     \}
     let a:this.is_locked = 0
 endfunction "}}}

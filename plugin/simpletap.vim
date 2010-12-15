@@ -28,6 +28,10 @@ command!
 \   SimpleTapRunFile
 \   call simpletap#run_file(<q-args>)
 
+command!
+\   SimpleTapSingleTest
+\   call simpletap#run_single_test()
+
 
 " Restore 'cpoptions' {{{
 let &cpo = s:save_cpo
