@@ -605,6 +605,7 @@ function! {s:Stat.constructor()}(this) "{{{
     \   'done_testing': 0,
     \   'test_result': [],
     \   'output_info': [],
+    \   'skipped': 0,
     \}
     let a:this.is_locked = 0
 endfunction "}}}
@@ -757,12 +758,12 @@ function! {s:Stat.method('begin_test')}(this, file) "{{{
     call a:this.add('output_info', [hl, msg])
 endfunction "}}}
 
-function! {s:Stat.method('end_test')}(this, file, skipped) "{{{
+function! {s:Stat.method('end_test')}(this, file) "{{{
     let test_result = a:this.get('test_result')
     let failed_result_num = len(filter(copy(test_result), 'v:val ==# s:FAIL'))
     let passed_result_num = len(test_result) - failed_result_num
 
-    if a:skipped
+    if s:stat.get('skipped')
         call a:this.add('output_info', [g:simpletap#echohl_skip, 'Skip.'])
     elseif !a:this.get('done_testing')
         call s:warnf("test '%s' has not done properly.", a:file)
@@ -779,12 +780,13 @@ function! {s:Stat.method('source')}(this, file) "{{{
     call a:this.begin_test(a:file)
     try
         source `=a:file`
-        call a:this.end_test(a:file, 0)
+        call a:this.end_test(a:file)
         let results = a:this.get('test_result')
         let failed = !empty(filter(copy(results), 'v:val ==# s:FAIL'))
         return failed ? 0 : 1
     catch /^simpletap - SKIP$/
-        call a:this.end_test(a:file, 1)
+        call s:stat.set('skipped', 1)
+        call a:this.end_test(a:file)
         return 1
     catch
         for msg in [
