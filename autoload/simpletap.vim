@@ -248,23 +248,16 @@ function! {s:Runner.method('run_file')}(this, file) "{{{
         return
     endif
 
-    " Create buffer if needed.
-    let output_bufnr = -1
-    if g:simpletap#output_to ==# 'buffer'
-        let output_bufnr = a:this.create_buffer()
-    endif
+    " Create buffer.
+    call a:this.create_buffer()
 
     call a:this.define_commands()
     call s:stat.begin_test(file)
     let passed = s:stat.source(file)
     call s:stat.end_test(file)
-    call s:stat.output_summary(output_bufnr)
+    call s:stat.output_summary()
     call a:this.delete_commands()
-    call s:stat.output_all_summary(output_bufnr, passed)
-
-    if g:simpletap#report && output_bufnr ==# -1
-        messages
-    endif
+    call s:stat.output_all_summary(passed)
 endfunction "}}}
 
 function! {s:Runner.method('run_dir')}(this, dir) "{{{
@@ -275,11 +268,8 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
     endif
     let pat = dir . '/' . (g:simpletap#recursive ? '**/*.vim' : '*.vim')
 
-    " Create buffer if needed.
-    let output_bufnr = -1
-    if g:simpletap#output_to ==# 'buffer'
-        let output_bufnr = a:this.create_buffer()
-    endif
+    " Create buffer.
+    call a:this.create_buffer()
 
     call a:this.define_commands()
     let pass_all = 1
@@ -289,14 +279,10 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
             let pass_all = 0
         endif
         call s:stat.end_test(t)
-        call s:stat.output_summary(output_bufnr)
+        call s:stat.output_summary()
     endfor
     call a:this.delete_commands()
-    call s:stat.output_all_summary(output_bufnr, pass_all)
-
-    if g:simpletap#report && output_bufnr ==# -1
-        messages
-    endif
+    call s:stat.output_all_summary(pass_all)
 endfunction "}}}
 
 
@@ -757,9 +743,7 @@ function! {s:Stat.method('begin_test')}(this, file) "{{{
     call a:this.initialize()
 
     let [hl, msg] = [g:simpletap#echohl_begin, 'Testing ... ' . a:file]
-    if g:simpletap#output_to ==# 'buffer'
-        call s:echomsg(hl, msg)
-    endif
+    call s:echomsg(hl, msg)
     call a:this.add('output_info', [hl, msg])
 endfunction "}}}
 
@@ -806,27 +790,21 @@ function! {s:Stat.method('source')}(this, file) "{{{
     endtry
 endfunction "}}}
 
-function! {s:Stat.method('output')}(this, bufnr, lines) "{{{
-    if a:bufnr ==# -1
-        for [hl, msg] in a:lines
-            call s:echomsg(hl, msg)
-        endfor
-    else
-        call s:assert(a:bufnr ==# bufnr('%'), 's:Stat.output(): a:bufnr is current buffer')
-        call setline(line('$'), map(copy(a:lines), 'v:val[1]'))
-    endif
+function! {s:Stat.method('output')}(this, lines) "{{{
+    " Assumption: current buffer is output buffer.
+    call setline(line('$'), map(copy(a:lines), 'v:val[1]'))
 endfunction "}}}
 
-function! {s:Stat.method('output_summary')}(this, bufnr) "{{{
+function! {s:Stat.method('output_summary')}(this) "{{{
     let results = copy(a:this.get('test_result'))
     let failed = !empty(filter(results, 'v:val ==# s:FAIL'))
     let output_info = a:this.get('output_info')
     if !g:simpletap#show_only_failed || g:simpletap#show_only_failed && failed
-        call a:this.output(a:bufnr, output_info)
+        call a:this.output(output_info)
     endif
 endfunction "}}}
 
-function! {s:Stat.method('output_all_summary')}(this, bufnr, pass_all) "{{{
+function! {s:Stat.method('output_all_summary')}(this, pass_all) "{{{
     let lines = []
 
     if a:pass_all
@@ -839,7 +817,7 @@ function! {s:Stat.method('output_all_summary')}(this, bufnr, pass_all) "{{{
         return
     endif
 
-    call a:this.output(a:bufnr, lines)
+    call a:this.output(lines)
 endfunction "}}}
 
 " }}}
@@ -906,8 +884,6 @@ function! s:initialize() "{{{
     call s:def('g:simpletap#recursive', 1)
     call s:def('g:simpletap#show_only_failed', 1)
     call s:def('g:simpletap#show_exception', 1)
-    call s:def('g:simpletap#report', 1)
-    call s:def('g:simpletap#output_to', 'buffer')
 
     delfunc s:def
     delfunc s:def_hash
