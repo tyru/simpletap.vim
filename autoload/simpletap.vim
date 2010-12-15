@@ -815,6 +815,15 @@ function! {s:Stat.method('output_all_summary')}(this, pass_all) "{{{
     call a:this.output(lines)
 endfunction "}}}
 
+function! {s:Stat.method('passed_all')}(this) "{{{
+    for r in s:stat.get('test_results')
+        if r ==# s:FAIL
+            return 0
+        endif
+    endfor
+    return 1
+endfunction "}}}
+
 " }}}
 
 " }}}
