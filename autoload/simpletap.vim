@@ -7,11 +7,12 @@ set cpo&vim
 " }}}
 
 
-" Variables
+" Current instances of each class.
 let s:runner = {}
 let s:tap = {}
 let s:stat = {}
 
+" Test status
 let [s:PASS, s:FAIL] = range(2)
 
 
