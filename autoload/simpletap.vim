@@ -657,12 +657,10 @@ function! {s:Stat.method('get_output')}(this, Code) "{{{
         else
             throw s:error("type error")
         endif
-        if g:simpletap#silent
-            silent execute ex
-        else
-            execute ex
-        endif
+
+        silent execute ex
         redir END
+
         return substitute(output, '^\n', '', '')
     finally
         redir END
@@ -874,7 +872,6 @@ function! s:initialize() "{{{
     \       'throws_ok': 'got exception: %s, expected like: %s',
     \   },
     \)
-    call s:def('g:simpletap#silent', 1)
     call s:def('g:simpletap#echohl_diag', 'Comment')
     call s:def('g:simpletap#echohl_error', 'WarningMsg')
     call s:def('g:simpletap#echohl_begin', 'None')
