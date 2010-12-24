@@ -253,7 +253,9 @@ function! {s:Runner.method('run_file')}(this, file) "{{{
     endif
 
     " Create buffer.
-    call a:this.create_buffer()
+    if a:this.create_buffer() < 0
+        return
+    endif
 
     call a:this.define_commands()
     call s:stat.begin_test(file)
@@ -273,7 +275,9 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
     let pat = dir . '/' . (g:simpletap#recursive ? '**/*.vim' : '*.vim')
 
     " Create buffer.
-    call a:this.create_buffer()
+    if a:this.create_buffer() < 0
+        return
+    endif
 
     call a:this.define_commands()
     let pass_all = 1
@@ -290,14 +294,20 @@ function! {s:Runner.method('run_dir')}(this, dir) "{{{
 endfunction "}}}
 
 function! {s:Runner.method('run_single_test')}(this) "{{{
-    call s:runner.create_buffer()
+    if s:runner.create_buffer() < 0
+        return
+    endif
     call s:runner.define_commands()
     call s:stat.set('running_single_test', 1)
 endfunction "}}}
 
 
 function! {s:Runner.method('create_buffer')}(this) "{{{
-    execute g:simpletap#open_command
+    try
+        execute g:simpletap#open_command
+    catch
+        return -1
+    endtry
 
     " Clean up the screen.
     % delete _
