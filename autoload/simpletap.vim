@@ -297,7 +297,7 @@ endfunction "}}}
 
 
 function! {s:Runner.method('create_buffer')}(this) "{{{
-    new
+    execute g:simpletap#open_command
 
     " Clean up the screen.
     % delete _
@@ -906,6 +906,7 @@ function! s:initialize() "{{{
     call s:def('g:simpletap#echohl_output', 'None')
     call s:def('g:simpletap#recursive', 1)
     call s:def('g:simpletap#show_only_failed', 1)
+    call s:def('g:simpletap#open_command', 'new')
 
     delfunc s:def
     delfunc s:def_hash
