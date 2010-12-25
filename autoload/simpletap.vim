@@ -11,6 +11,7 @@ set cpo&vim
 let s:runner = {}
 let s:tap = {}
 let s:stat = {}
+let s:buffer_manager = {}
 
 " Test status
 let [s:PASS, s:FAIL] = range(2)
@@ -217,6 +218,9 @@ function! s:set_up_variables() "{{{
     let s:runner = s:Runner.new()
     let s:tap = s:Simpletap.new()
     let s:stat = s:tap._stat
+    if empty(s:buffer_manager)
+        let s:buffer_manager = openbuf#new('simpletap')
+    endif
 endfunction "}}}
 
 
@@ -304,7 +308,11 @@ endfunction "}}}
 
 function! {s:Runner.method('create_buffer')}(this) "{{{
     try
-        execute g:simpletap#open_command
+        call s:buffer_manager.open({
+        \   'bufname': '__simpletap_summary__',
+        \   'opener': g:simpletap#open_command,
+        \   'silent': 1,
+        \})
     catch
         return -1
     endtry
