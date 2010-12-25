@@ -9,6 +9,7 @@ License: Under the same license as Vim itself (see :help license)
 CONTENTS						*simpletap-contents*
 
 Introduction		|simpletap-introduction|
+Requirements		|simpletap-requirements|
 Interface			|simpletap-interface|
   Keymappings		|simpletap-keymappings|
   Variables			|simpletap-variables|
@@ -19,6 +20,13 @@ Changelog			|simpletap-changelog|
 
 ==============================================================================
 INTRODUCTION						*simpletap-introduction* {{{
+}}}
+==============================================================================
+REQUIREMENTS						*simpletap-requirements* {{{
+
+openbuf.vim
+- http://github.com/thinca/vim-openbuf
+
 }}}
 ==============================================================================
 INTERFACE				*simpletap-interface* {{{
