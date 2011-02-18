@@ -341,60 +341,67 @@ function! {s:Runner.method('create_buffer')}(this) "{{{
     return bufnr('%')
 endfunction "}}}
 
+function! s:call_with_q_args(func_name, args, q_args) "{{{
+    return call(
+    \   a:func_name,
+    \   a:args + (len(a:args) == 2 ? [a:q_args] : [])
+    \)
+endfunction "}}}
+
 function! {s:Runner.method('define_commands')}(this) "{{{
     " TODO Don't do it yourself
     command!
     \   -nargs=*
     \   OK
-    \   call simpletap#ok(<args>)
+    \   call s:call_with_q_args('simpletap#ok', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   Ok
-    \   call simpletap#ok(<args>)
+    \   call s:call_with_q_args('simpletap#ok', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   Is
-    \   call simpletap#is(<args>)
+    \   call s:call_with_q_args('simpletap#is', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   Isnt
-    \   call simpletap#isnt(<args>)
+    \   call s:call_with_q_args('simpletap#isnt', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   IsDeeply
-    \   call simpletap#is_deeply(<args>)
+    \   call s:call_with_q_args('simpletap#is_deeply', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   Like
-    \   call simpletap#like(<args>)
+    \   call s:call_with_q_args('simpletap#like', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   Unlike
-    \   call simpletap#unlike(<args>)
+    \   call s:call_with_q_args('simpletap#unlike', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   ThrowsOK
-    \   call simpletap#throws_ok(<args>)
+    \   call s:call_with_q_args('simpletap#throws_ok', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   ThrowsOk
-    \   call simpletap#throws_ok(<args>)
+    \   call s:call_with_q_args('simpletap#throws_ok', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   StdoutIs
-    \   call simpletap#stdout_is(<args>)
+    \   call s:call_with_q_args('simpletap#stdout_is', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   StdoutIsnt
-    \   call simpletap#stdout_isnt(<args>)
+    \   call s:call_with_q_args('simpletap#stdout_isnt', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   StdoutLike
-    \   call simpletap#stdout_like(<args>)
+    \   call s:call_with_q_args('simpletap#stdout_like', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   StdoutUnlike
-    \   call simpletap#stdout_unlike(<args>)
+    \   call s:call_with_q_args('simpletap#stdout_unlike', [<args>], <q-args>)
     command!
     \   -nargs=*
     \   Diag
