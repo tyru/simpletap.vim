@@ -819,7 +819,7 @@ function! {s:Stat.method('source')}(this, file) "{{{
         return 1
     catch
         for msg in [
-        \   '!!!# Exception throwed.',
+        \   '!!!# Exception occurred.',
         \   '!!!# v:exception = ' . string(v:exception),
         \   '!!!# v:throwpoint = ' . string(v:throwpoint),
         \]
