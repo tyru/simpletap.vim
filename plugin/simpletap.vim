@@ -13,15 +13,6 @@ set cpo&vim
 " }}}
 
 
-if globpath(&rtp, 'autoload/openbuf.vim') == ''
-\   || globpath(&rtp, 'autoload/vice.vim') == ''
-    echohl ErrorMsg
-    echomsg 'openbuf.vim and/or vice.vim are not installed! (:help simpletap-requirements)'
-    echohl None
-    finish
-endif
-
-
 command!
 \   -nargs=1 -complete=file
 \   SimpleTapRun
