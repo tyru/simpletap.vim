@@ -26,6 +26,8 @@ REQUIREMENTS						*simpletap-requirements* {{{
 
 openbuf.vim
 - http://github.com/thinca/vim-openbuf
+vice.vim
+- https://github.com/tyru/vice.vim
 
 }}}
 ==============================================================================
